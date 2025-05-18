@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Layout of State Variables in Storage &mdash; Solidity 0.7.6 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/a4_railroad_diagram.css?v=a92580d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/fonts.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=f142d018" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom-dark.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/toggle.css?v=3a09e99e" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=918ced64"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/js/constants.js"></script>
+        <script src="../_static/js/initialize.js"></script>
+        <script src="../_static/js/toggle.js?v=531d20fa"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Layout in Memory" href="layout_in_memory.html" />
+    <link rel="prev" title="Language Grammar" href="../grammar.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+          </a>
+              <div class="version">
+                0.7.6
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+    
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction-to-smart-contracts.html">Introduction to Smart Contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installing-solidity.html">Installing the Solidity Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../solidity-by-example.html">Solidity by Example</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Language Description</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../layout-of-source-files.html">Layout of a Solidity Source File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure-of-a-contract.html">Structure of a Contract</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../types.html">Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../units-and-global-variables.html">Units and Globally Available Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../control-structures.html">Expressions and Control Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contracts.html">Contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../assembly.html">Inline Assembly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cheatsheet.html">Cheatsheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../grammar.html">Language Grammar</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Internals</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Layout of State Variables in Storage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#mappings-and-dynamic-arrays">Mappings and Dynamic Arrays</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#bytes-and-string"><code class="docutils literal notranslate"><span class="pre">bytes</span></code> and <code class="docutils literal notranslate"><span class="pre">string</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#json-output">JSON Output</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="layout_in_memory.html">Layout in Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layout_in_calldata.html">Layout of Call Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="variable_cleanup.html">Cleaning Up Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source_mappings.html">Source Mappings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimiser.html">The Optimiser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../metadata.html">Contract Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../abi-spec.html">Contract ABI Specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Material</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../050-breaking-changes.html">Solidity v0.5.0 Breaking Changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../060-breaking-changes.html">Solidity v0.6.0 Breaking Changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../070-breaking-changes.html">Solidity v0.7.0 Breaking Changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../natspec-format.html">NatSpec Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../security-considerations.html">Security Considerations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../resources.html">Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../using-the-compiler.html">Using the compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../yul.html">Yul</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../style-guide.html">Style Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../common-patterns.html">Common Patterns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bugs.html">List of Known Bugs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../brand-guide.html">Solidity Brand Guide</a></li>
+</ul>
+
+    <a href="genindex.html">Keyword Index</a>
+  
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Solidity</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Layout of State Variables in Storage</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/internals/layout_in_storage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="layout-of-state-variables-in-storage">
+<span id="index-0"></span><h1>Layout of State Variables in Storage<a class="headerlink" href="#layout-of-state-variables-in-storage" title="Link to this heading"></a></h1>
+<p id="storage-inplace-encoding">Statically-sized variables (everything except mapping and dynamically-sized
+array types) are laid out contiguously in storage starting from position <code class="docutils literal notranslate"><span class="pre">0</span></code>.
+Multiple, contiguous items that need less than 32 bytes are packed into a single
+storage slot if possible, according to the following rules:</p>
+<ul class="simple">
+<li><p>The first item in a storage slot is stored lower-order aligned.</p></li>
+<li><p>Elementary types use only as many bytes as are necessary to store them.</p></li>
+<li><p>If an elementary type does not fit the remaining part of a storage slot, it is moved to the next storage slot.</p></li>
+<li><p>Structs and array data always start a new slot and occupy whole slots
+(but items inside a struct or array are packed tightly according to these rules).</p></li>
+</ul>
+<p>For contracts that use inheritance, the ordering of state variables is determined by the
+C3-linearized order of contracts starting with the most base-ward contract. If allowed
+by the above rules, state variables from different contracts do share the same storage slot.</p>
+<p>The elements of structs and arrays are stored after each other, just as if they were given explicitly.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>When using elements that are smaller than 32 bytes, your contract’s gas usage may be higher.
+This is because the EVM operates on 32 bytes at a time. Therefore, if the element is smaller
+than that, the EVM must use more operations in order to reduce the size of the element from 32
+bytes to the desired size.</p>
+<p>It is only beneficial to use reduced-size arguments if you are dealing with storage values
+because the compiler will pack multiple elements into one storage slot, and thus, combine
+multiple reads or writes into a single operation. When dealing with function arguments or memory
+values, there is no inherent benefit because the compiler does not pack these values.</p>
+<p>Finally, in order to allow the EVM to optimize for this, ensure that you try to order your
+storage variables and <code class="docutils literal notranslate"><span class="pre">struct</span></code> members such that they can be packed tightly. For example,
+declaring your storage variables in the order of <code class="docutils literal notranslate"><span class="pre">uint128,</span> <span class="pre">uint128,</span> <span class="pre">uint256</span></code> instead of
+<code class="docutils literal notranslate"><span class="pre">uint128,</span> <span class="pre">uint256,</span> <span class="pre">uint128</span></code>, as the former will only take up two slots of storage whereas the
+latter will take up three.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The layout of state variables in storage is considered to be part of the external interface
+of Solidity due to the fact that storage pointers can be passed to libraries. This means that
+any change to the rules outlined in this section is considered a breaking change
+of the language and due to its critical nature should be considered very carefully before
+being executed.</p>
+</div>
+<section id="mappings-and-dynamic-arrays">
+<h2>Mappings and Dynamic Arrays<a class="headerlink" href="#mappings-and-dynamic-arrays" title="Link to this heading"></a></h2>
+<p id="storage-hashed-encoding">Due to their unpredictable size, mapping and dynamically-sized array types use a Keccak-256 hash
+computation to find the starting position of the value or the array data.
+These starting positions are always full stack slots.</p>
+<p>The mapping or the dynamic array itself occupies a slot in storage at some position <code class="docutils literal notranslate"><span class="pre">p</span></code>
+according to the above rule (or by recursively applying this rule for
+mappings of mappings or arrays of arrays). For dynamic arrays,
+this slot stores the number of elements in the array (byte arrays and
+strings are an exception, see <a class="reference internal" href="#bytes-and-string"><span class="std std-ref">below</span></a>).
+For mappings, the slot is unused (but it is needed so that two equal mappings after each other will use a different
+hash distribution). Array data is located at <code class="docutils literal notranslate"><span class="pre">keccak256(p)</span></code> and the value corresponding to a mapping key
+<code class="docutils literal notranslate"><span class="pre">k</span></code> is located at <code class="docutils literal notranslate"><span class="pre">keccak256(k</span> <span class="pre">.</span> <span class="pre">p)</span></code> where <code class="docutils literal notranslate"><span class="pre">.</span></code> is concatenation. If the value is again a
+non-elementary type, the positions are found by adding an offset of <code class="docutils literal notranslate"><span class="pre">keccak256(k</span> <span class="pre">.</span> <span class="pre">p)</span></code>.</p>
+<p>So for the following contract snippet
+the position of <code class="docutils literal notranslate"><span class="pre">data[4][9].b</span></code> is at <code class="docutils literal notranslate"><span class="pre">keccak256(uint256(9)</span> <span class="pre">.</span> <span class="pre">keccak256(uint256(4)</span> <span class="pre">.</span> <span class="pre">uint256(1)))</span> <span class="pre">+</span> <span class="pre">1</span></code>:</p>
+<p class="remix-link-container"><a class="remix-link reference external" href="https://remix.ethereum.org/?#language=solidity&amp;version=0.7.6&amp;code=Ly8gU1BEWC1MaWNlbnNlLUlkZW50aWZpZXI6IEdQTC0zLjAKcHJhZ21hIHNvbGlkaXR5ID49MC40LjAgPDAuOC4wOwoKCmNvbnRyYWN0IEMgewogICAgc3RydWN0IFMgeyB1aW50IGE7IHVpbnQgYjsgfQogICAgdWludCB4OwogICAgbWFwcGluZyh1aW50ID0+IG1hcHBpbmcodWludCA9PiBTKSkgZGF0YTsKfQ==" target="_blank">open in Remix</a></p>
+<div class="highlight-Solidity notranslate"><div class="highlight"><pre><span></span><span class="c1">// </span><span class="cs">SPDX-License-Identifier:</span><span class="c1"> GPL-3.0</span>
+<span class="k">pragma solidity</span> <span class="o">&gt;=</span><span class="mf">0.4</span><span class="p">.</span><span class="mi">0</span> <span class="o">&lt;</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+
+<span class="kd">contract</span> <span class="n">C</span> <span class="p">{</span>
+    <span class="kd">struct</span> <span class="n">S</span> <span class="p">{</span> <span class="kt">uint</span> <span class="n">a</span><span class="p">;</span> <span class="kt">uint</span> <span class="n">b</span><span class="p">;</span> <span class="p">}</span>
+    <span class="kt">uint</span> <span class="n">x</span><span class="p">;</span>
+    <span class="kd">mapping</span><span class="p">(</span><span class="kt">uint</span> <span class="o">=&gt;</span> <span class="kd">mapping</span><span class="p">(</span><span class="kt">uint</span> <span class="o">=&gt;</span> <span class="n">S</span><span class="p">))</span> <span class="n">data</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<section id="bytes-and-string">
+<span id="id1"></span><h3><code class="docutils literal notranslate"><span class="pre">bytes</span></code> and <code class="docutils literal notranslate"><span class="pre">string</span></code><a class="headerlink" href="#bytes-and-string" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">bytes</span></code> and <code class="docutils literal notranslate"><span class="pre">string</span></code> are encoded identically. For short byte arrays, they store their data in the same
+slot where the length is also stored. In particular: if the data is at most <code class="docutils literal notranslate"><span class="pre">31</span></code> bytes long, it is stored
+in the higher-order bytes (left aligned) and the lowest-order byte stores <code class="docutils literal notranslate"><span class="pre">length</span> <span class="pre">*</span> <span class="pre">2</span></code>.
+For byte arrays that store data which is <code class="docutils literal notranslate"><span class="pre">32</span></code> or more bytes long, the main slot stores <code class="docutils literal notranslate"><span class="pre">length</span> <span class="pre">*</span> <span class="pre">2</span> <span class="pre">+</span> <span class="pre">1</span></code> and the data is
+stored as usual in <code class="docutils literal notranslate"><span class="pre">keccak256(slot)</span></code>. This means that you can distinguish a short array from a long array
+by checking if the lowest bit is set: short (not set) and long (set).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Handling invalidly encoded slots is currently not supported but may be added in the future.</p>
+</div>
+</section>
+</section>
+<section id="json-output">
+<h2>JSON Output<a class="headerlink" href="#json-output" title="Link to this heading"></a></h2>
+<p id="storage-layout-top-level">The storage layout of a contract can be requested via
+the <a class="reference internal" href="../using-the-compiler.html#compiler-api"><span class="std std-ref">standard JSON interface</span></a>.  The output is a JSON object containing two keys,
+<code class="docutils literal notranslate"><span class="pre">storage</span></code> and <code class="docutils literal notranslate"><span class="pre">types</span></code>.  The <code class="docutils literal notranslate"><span class="pre">storage</span></code> object is an array where each
+element has the following form:</p>
+<p class="remix-link-container"><a class="remix-link reference external" href="https://remix.ethereum.org/?#language=solidity&amp;version=0.7.6&amp;code=ewogICAgImFzdElkIjogMiwKICAgICJjb250cmFjdCI6ICJmaWxlQTpBIiwKICAgICJsYWJlbCI6ICJ4IiwKICAgICJvZmZzZXQiOiAwLAogICAgInNsb3QiOiAiMCIsCiAgICAidHlwZSI6ICJ0X3VpbnQyNTYiCn0=" target="_blank">open in Remix</a></p>
+<div class="highlight-Solidity notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s">&quot;astId&quot;</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s">&quot;contract&quot;</span><span class="o">:</span> <span class="s">&quot;fileA:A&quot;</span><span class="p">,</span>
+    <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;x&quot;</span><span class="p">,</span>
+    <span class="s">&quot;offset&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s">&quot;slot&quot;</span><span class="o">:</span> <span class="s">&quot;0&quot;</span><span class="p">,</span>
+    <span class="s">&quot;type&quot;</span><span class="o">:</span> <span class="s">&quot;t_uint256&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The example above is the storage layout of <code class="docutils literal notranslate"><span class="pre">contract</span> <span class="pre">A</span> <span class="pre">{</span> <span class="pre">uint</span> <span class="pre">x;</span> <span class="pre">}</span></code> from source unit <code class="docutils literal notranslate"><span class="pre">fileA</span></code>
+and</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">astId</span></code> is the id of the AST node of the state variable’s declaration</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">contract</span></code> is the name of the contract including its path as prefix</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">label</span></code> is the name of the state variable</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">offset</span></code> is the offset in bytes within the storage slot according to the encoding</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slot</span></code> is the storage slot where the state variable resides or starts. This
+number may be very large and therefore its JSON value is represented as a
+string.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">type</span></code> is an identifier used as key to the variable’s type information (described in the following)</p></li>
+</ul>
+<p>The given <code class="docutils literal notranslate"><span class="pre">type</span></code>, in this case <code class="docutils literal notranslate"><span class="pre">t_uint256</span></code> represents an element in
+<code class="docutils literal notranslate"><span class="pre">types</span></code>, which has the form:</p>
+<p class="remix-link-container"><a class="remix-link reference external" href="https://remix.ethereum.org/?#language=solidity&amp;version=0.7.6&amp;code=ewogICAgImVuY29kaW5nIjogImlucGxhY2UiLAogICAgImxhYmVsIjogInVpbnQyNTYiLAogICAgIm51bWJlck9mQnl0ZXMiOiAiMzIiLAp9" target="_blank">open in Remix</a></p>
+<div class="highlight-Solidity notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s">&quot;encoding&quot;</span><span class="o">:</span> <span class="s">&quot;inplace&quot;</span><span class="p">,</span>
+    <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;uint256&quot;</span><span class="p">,</span>
+    <span class="s">&quot;numberOfBytes&quot;</span><span class="o">:</span> <span class="s">&quot;32&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>where</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">encoding</span></code> how the data is encoded in storage, where the possible values are:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">inplace</span></code>: data is laid out contiguously in storage (see <a class="reference internal" href="#storage-inplace-encoding"><span class="std std-ref">above</span></a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mapping</span></code>: Keccak-256 hash-based method (see <a class="reference internal" href="#storage-hashed-encoding"><span class="std std-ref">above</span></a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dynamic_array</span></code>: Keccak-256 hash-based method (see <a class="reference internal" href="#storage-hashed-encoding"><span class="std std-ref">above</span></a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bytes</span></code>: single slot or Keccak-256 hash-based depending on the data size (see <a class="reference internal" href="#bytes-and-string"><span class="std std-ref">above</span></a>).</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">label</span></code> is the canonical type name.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">numberOfBytes</span></code> is the number of used bytes (as a decimal string).
+Note that if <code class="docutils literal notranslate"><span class="pre">numberOfBytes</span> <span class="pre">&gt;</span> <span class="pre">32</span></code> this means that more than one slot is used.</p></li>
+</ul>
+<p>Some types have extra information besides the four above. Mappings contain
+its <code class="docutils literal notranslate"><span class="pre">key</span></code> and <code class="docutils literal notranslate"><span class="pre">value</span></code> types (again referencing an entry in this mapping
+of types), arrays have its <code class="docutils literal notranslate"><span class="pre">base</span></code> type, and structs list their <code class="docutils literal notranslate"><span class="pre">members</span></code> in
+the same format as the top-level <code class="docutils literal notranslate"><span class="pre">storage</span></code> (see <a class="reference internal" href="#storage-layout-top-level"><span class="std std-ref">above</span></a>).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The JSON output format of a contract’s storage layout is still considered experimental
+and is subject to change in non-breaking releases of Solidity.</p>
+</div>
+<p>The following example shows a contract and its storage layout, containing
+value and reference types, types that are encoded packed, and nested types.</p>
+<p class="remix-link-container"><a class="remix-link reference external" href="https://remix.ethereum.org/?#language=solidity&amp;version=0.7.6&amp;code=Ly8gU1BEWC1MaWNlbnNlLUlkZW50aWZpZXI6IEdQTC0zLjAKcHJhZ21hIHNvbGlkaXR5ID49MC40LjAgPDAuOC4wOwpjb250cmFjdCBBIHsKICAgIHN0cnVjdCBTIHsKICAgICAgICB1aW50MTI4IGE7CiAgICAgICAgdWludDEyOCBiOwogICAgICAgIHVpbnRbMl0gc3RhdGljQXJyYXk7CiAgICAgICAgdWludFtdIGR5bkFycmF5OwogICAgfQoKICAgIHVpbnQgeDsKICAgIHVpbnQgeTsKICAgIFMgczsKICAgIGFkZHJlc3MgYWRkcjsKICAgIG1hcHBpbmcgKHVpbnQgPT4gbWFwcGluZyAoYWRkcmVzcyA9PiBib29sKSkgbWFwOwogICAgdWludFtdIGFycmF5OwogICAgc3RyaW5nIHMxOwogICAgYnl0ZXMgYjE7Cn0=" target="_blank">open in Remix</a></p>
+<div class="highlight-Solidity notranslate"><div class="highlight"><pre><span></span><span class="c1">// </span><span class="cs">SPDX-License-Identifier:</span><span class="c1"> GPL-3.0</span>
+<span class="k">pragma solidity</span> <span class="o">&gt;=</span><span class="mf">0.4</span><span class="p">.</span><span class="mi">0</span> <span class="o">&lt;</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+<span class="kd">contract</span> <span class="n">A</span> <span class="p">{</span>
+    <span class="kd">struct</span> <span class="n">S</span> <span class="p">{</span>
+        <span class="kt">uint128</span> <span class="n">a</span><span class="p">;</span>
+        <span class="kt">uint128</span> <span class="n">b</span><span class="p">;</span>
+        <span class="kt">uint</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">staticArray</span><span class="p">;</span>
+        <span class="kt">uint</span><span class="p">[]</span> <span class="n">dynArray</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kt">uint</span> <span class="n">x</span><span class="p">;</span>
+    <span class="kt">uint</span> <span class="n">y</span><span class="p">;</span>
+    <span class="n">S</span> <span class="n">s</span><span class="p">;</span>
+    <span class="kt">address</span> <span class="n">addr</span><span class="p">;</span>
+    <span class="kd">mapping</span> <span class="p">(</span><span class="kt">uint</span> <span class="o">=&gt;</span> <span class="kd">mapping</span> <span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">bool</span><span class="p">))</span> <span class="n">map</span><span class="p">;</span>
+    <span class="kt">uint</span><span class="p">[]</span> <span class="n">array</span><span class="p">;</span>
+    <span class="kt">string</span> <span class="n">s1</span><span class="p">;</span>
+    <span class="kt">bytes</span> <span class="n">b1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p class="remix-link-container"><a class="remix-link reference external" href="https://remix.ethereum.org/?#language=solidity&amp;version=0.7.6&amp;code=InN0b3JhZ2VMYXlvdXQiOiB7CiAgInN0b3JhZ2UiOiBbCiAgICB7CiAgICAgICJhc3RJZCI6IDE0LAogICAgICAiY29udHJhY3QiOiAiZmlsZUE6QSIsCiAgICAgICJsYWJlbCI6ICJ4IiwKICAgICAgIm9mZnNldCI6IDAsCiAgICAgICJzbG90IjogIjAiLAogICAgICAidHlwZSI6ICJ0X3VpbnQyNTYiCiAgICB9LAogICAgewogICAgICAiYXN0SWQiOiAxNiwKICAgICAgImNvbnRyYWN0IjogImZpbGVBOkEiLAogICAgICAibGFiZWwiOiAieSIsCiAgICAgICJvZmZzZXQiOiAwLAogICAgICAic2xvdCI6ICIxIiwKICAgICAgInR5cGUiOiAidF91aW50MjU2IgogICAgfSwKICAgIHsKICAgICAgImFzdElkIjogMTgsCiAgICAgICJjb250cmFjdCI6ICJmaWxlQTpBIiwKICAgICAgImxhYmVsIjogInMiLAogICAgICAib2Zmc2V0IjogMCwKICAgICAgInNsb3QiOiAiMiIsCiAgICAgICJ0eXBlIjogInRfc3RydWN0KFMpMTJfc3RvcmFnZSIKICAgIH0sCiAgICB7CiAgICAgICJhc3RJZCI6IDIwLAogICAgICAiY29udHJhY3QiOiAiZmlsZUE6QSIsCiAgICAgICJsYWJlbCI6ICJhZGRyIiwKICAgICAgIm9mZnNldCI6IDAsCiAgICAgICJzbG90IjogIjYiLAogICAgICAidHlwZSI6ICJ0X2FkZHJlc3MiCiAgICB9LAogICAgewogICAgICAiYXN0SWQiOiAyNiwKICAgICAgImNvbnRyYWN0IjogImZpbGVBOkEiLAogICAgICAibGFiZWwiOiAibWFwIiwKICAgICAgIm9mZnNldCI6IDAsCiAgICAgICJzbG90IjogIjciLAogICAgICAidHlwZSI6ICJ0X21hcHBpbmcodF91aW50MjU2LHRfbWFwcGluZyh0X2FkZHJlc3MsdF9ib29sKSkiCiAgICB9LAogICAgewogICAgICAiYXN0SWQiOiAyOSwKICAgICAgImNvbnRyYWN0IjogImZpbGVBOkEiLAogICAgICAibGFiZWwiOiAiYXJyYXkiLAogICAgICAib2Zmc2V0IjogMCwKICAgICAgInNsb3QiOiAiOCIsCiAgICAgICJ0eXBlIjogInRfYXJyYXkodF91aW50MjU2KWR5bl9zdG9yYWdlIgogICAgfSwKICAgIHsKICAgICAgImFzdElkIjogMzEsCiAgICAgICJjb250cmFjdCI6ICJmaWxlQTpBIiwKICAgICAgImxhYmVsIjogInMxIiwKICAgICAgIm9mZnNldCI6IDAsCiAgICAgICJzbG90IjogIjkiLAogICAgICAidHlwZSI6ICJ0X3N0cmluZ19zdG9yYWdlIgogICAgfSwKICAgIHsKICAgICAgImFzdElkIjogMzMsCiAgICAgICJjb250cmFjdCI6ICJmaWxlQTpBIiwKICAgICAgImxhYmVsIjogImIxIiwKICAgICAgIm9mZnNldCI6IDAsCiAgICAgICJzbG90IjogIjEwIiwKICAgICAgInR5cGUiOiAidF9ieXRlc19zdG9yYWdlIgogICAgfQogIF0sCiAgInR5cGVzIjogewogICAgInRfYWRkcmVzcyI6IHsKICAgICAgImVuY29kaW5nIjogImlucGxhY2UiLAogICAgICAibGFiZWwiOiAiYWRkcmVzcyIsCiAgICAgICJudW1iZXJPZkJ5dGVzIjogIjIwIgogICAgfSwKICAgICJ0X2FycmF5KHRfdWludDI1NikyX3N0b3JhZ2UiOiB7CiAgICAgICJiYXNlIjogInRfdWludDI1NiIsCiAgICAgICJlbmNvZGluZyI6ICJpbnBsYWNlIiwKICAgICAgImxhYmVsIjogInVpbnQyNTZbMl0iLAogICAgICAibnVtYmVyT2ZCeXRlcyI6ICI2NCIKICAgIH0sCiAgICAidF9hcnJheSh0X3VpbnQyNTYpZHluX3N0b3JhZ2UiOiB7CiAgICAgICJiYXNlIjogInRfdWludDI1NiIsCiAgICAgICJlbmNvZGluZyI6ICJkeW5hbWljX2FycmF5IiwKICAgICAgImxhYmVsIjogInVpbnQyNTZbXSIsCiAgICAgICJudW1iZXJPZkJ5dGVzIjogIjMyIgogICAgfSwKICAgICJ0X2Jvb2wiOiB7CiAgICAgICJlbmNvZGluZyI6ICJpbnBsYWNlIiwKICAgICAgImxhYmVsIjogImJvb2wiLAogICAgICAibnVtYmVyT2ZCeXRlcyI6ICIxIgogICAgfSwKICAgICJ0X2J5dGVzX3N0b3JhZ2UiOiB7CiAgICAgICJlbmNvZGluZyI6ICJieXRlcyIsCiAgICAgICJsYWJlbCI6ICJieXRlcyIsCiAgICAgICJudW1iZXJPZkJ5dGVzIjogIjMyIgogICAgfSwKICAgICJ0X21hcHBpbmcodF9hZGRyZXNzLHRfYm9vbCkiOiB7CiAgICAgICJlbmNvZGluZyI6ICJtYXBwaW5nIiwKICAgICAgImtleSI6ICJ0X2FkZHJlc3MiLAogICAgICAibGFiZWwiOiAibWFwcGluZyhhZGRyZXNzID0+IGJvb2wpIiwKICAgICAgIm51bWJlck9mQnl0ZXMiOiAiMzIiLAogICAgICAidmFsdWUiOiAidF9ib29sIgogICAgfSwKICAgICJ0X21hcHBpbmcodF91aW50MjU2LHRfbWFwcGluZyh0X2FkZHJlc3MsdF9ib29sKSkiOiB7CiAgICAgICJlbmNvZGluZyI6ICJtYXBwaW5nIiwKICAgICAgImtleSI6ICJ0X3VpbnQyNTYiLAogICAgICAibGFiZWwiOiAibWFwcGluZyh1aW50MjU2ID0+IG1hcHBpbmcoYWRkcmVzcyA9PiBib29sKSkiLAogICAgICAibnVtYmVyT2ZCeXRlcyI6ICIzMiIsCiAgICAgICJ2YWx1ZSI6ICJ0X21hcHBpbmcodF9hZGRyZXNzLHRfYm9vbCkiCiAgICB9LAogICAgInRfc3RyaW5nX3N0b3JhZ2UiOiB7CiAgICAgICJlbmNvZGluZyI6ICJieXRlcyIsCiAgICAgICJsYWJlbCI6ICJzdHJpbmciLAogICAgICAibnVtYmVyT2ZCeXRlcyI6ICIzMiIKICAgIH0sCiAgICAidF9zdHJ1Y3QoUykxMl9zdG9yYWdlIjogewogICAgICAiZW5jb2RpbmciOiAiaW5wbGFjZSIsCiAgICAgICJsYWJlbCI6ICJzdHJ1Y3QgQS5TIiwKICAgICAgIm1lbWJlcnMiOiBbCiAgICAgICAgewogICAgICAgICAgImFzdElkIjogMiwKICAgICAgICAgICJjb250cmFjdCI6ICJmaWxlQTpBIiwKICAgICAgICAgICJsYWJlbCI6ICJhIiwKICAgICAgICAgICJvZmZzZXQiOiAwLAogICAgICAgICAgInNsb3QiOiAiMCIsCiAgICAgICAgICAidHlwZSI6ICJ0X3VpbnQxMjgiCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAiYXN0SWQiOiA0LAogICAgICAgICAgImNvbnRyYWN0IjogImZpbGVBOkEiLAogICAgICAgICAgImxhYmVsIjogImIiLAogICAgICAgICAgIm9mZnNldCI6IDE2LAogICAgICAgICAgInNsb3QiOiAiMCIsCiAgICAgICAgICAidHlwZSI6ICJ0X3VpbnQxMjgiCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAiYXN0SWQiOiA4LAogICAgICAgICAgImNvbnRyYWN0IjogImZpbGVBOkEiLAogICAgICAgICAgImxhYmVsIjogInN0YXRpY0FycmF5IiwKICAgICAgICAgICJvZmZzZXQiOiAwLAogICAgICAgICAgInNsb3QiOiAiMSIsCiAgICAgICAgICAidHlwZSI6ICJ0X2FycmF5KHRfdWludDI1NikyX3N0b3JhZ2UiCiAgICAgICAgfSwKICAgICAgICB7CiAgICAgICAgICAiYXN0SWQiOiAxMSwKICAgICAgICAgICJjb250cmFjdCI6ICJmaWxlQTpBIiwKICAgICAgICAgICJsYWJlbCI6ICJkeW5BcnJheSIsCiAgICAgICAgICAib2Zmc2V0IjogMCwKICAgICAgICAgICJzbG90IjogIjMiLAogICAgICAgICAgInR5cGUiOiAidF9hcnJheSh0X3VpbnQyNTYpZHluX3N0b3JhZ2UiCiAgICAgICAgfQogICAgICBdLAogICAgICAibnVtYmVyT2ZCeXRlcyI6ICIxMjgiCiAgICB9LAogICAgInRfdWludDEyOCI6IHsKICAgICAgImVuY29kaW5nIjogImlucGxhY2UiLAogICAgICAibGFiZWwiOiAidWludDEyOCIsCiAgICAgICJudW1iZXJPZkJ5dGVzIjogIjE2IgogICAgfSwKICAgICJ0X3VpbnQyNTYiOiB7CiAgICAgICJlbmNvZGluZyI6ICJpbnBsYWNlIiwKICAgICAgImxhYmVsIjogInVpbnQyNTYiLAogICAgICAibnVtYmVyT2ZCeXRlcyI6ICIzMiIKICAgIH0KICB9Cn0=" target="_blank">open in Remix</a></p>
+<div class="highlight-Solidity notranslate"><div class="highlight"><pre><span></span><span class="s">&quot;storageLayout&quot;</span><span class="o">:</span> <span class="p">{</span>
+  <span class="s">&quot;storage&quot;</span><span class="o">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="s">&quot;astId&quot;</span><span class="o">:</span> <span class="mi">14</span><span class="p">,</span>
+      <span class="s">&quot;contract&quot;</span><span class="o">:</span> <span class="s">&quot;fileA:A&quot;</span><span class="p">,</span>
+      <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;x&quot;</span><span class="p">,</span>
+      <span class="s">&quot;offset&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s">&quot;slot&quot;</span><span class="o">:</span> <span class="s">&quot;0&quot;</span><span class="p">,</span>
+      <span class="s">&quot;type&quot;</span><span class="o">:</span> <span class="s">&quot;t_uint256&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="s">&quot;astId&quot;</span><span class="o">:</span> <span class="mi">16</span><span class="p">,</span>
+      <span class="s">&quot;contract&quot;</span><span class="o">:</span> <span class="s">&quot;fileA:A&quot;</span><span class="p">,</span>
+      <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;y&quot;</span><span class="p">,</span>
+      <span class="s">&quot;offset&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s">&quot;slot&quot;</span><span class="o">:</span> <span class="s">&quot;1&quot;</span><span class="p">,</span>
+      <span class="s">&quot;type&quot;</span><span class="o">:</span> <span class="s">&quot;t_uint256&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="s">&quot;astId&quot;</span><span class="o">:</span> <span class="mi">18</span><span class="p">,</span>
+      <span class="s">&quot;contract&quot;</span><span class="o">:</span> <span class="s">&quot;fileA:A&quot;</span><span class="p">,</span>
+      <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;s&quot;</span><span class="p">,</span>
+      <span class="s">&quot;offset&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s">&quot;slot&quot;</span><span class="o">:</span> <span class="s">&quot;2&quot;</span><span class="p">,</span>
+      <span class="s">&quot;type&quot;</span><span class="o">:</span> <span class="s">&quot;t_struct(S)12_storage&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="s">&quot;astId&quot;</span><span class="o">:</span> <span class="mi">20</span><span class="p">,</span>
+      <span class="s">&quot;contract&quot;</span><span class="o">:</span> <span class="s">&quot;fileA:A&quot;</span><span class="p">,</span>
+      <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;addr&quot;</span><span class="p">,</span>
+      <span class="s">&quot;offset&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s">&quot;slot&quot;</span><span class="o">:</span> <span class="s">&quot;6&quot;</span><span class="p">,</span>
+      <span class="s">&quot;type&quot;</span><span class="o">:</span> <span class="s">&quot;t_address&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="s">&quot;astId&quot;</span><span class="o">:</span> <span class="mi">26</span><span class="p">,</span>
+      <span class="s">&quot;contract&quot;</span><span class="o">:</span> <span class="s">&quot;fileA:A&quot;</span><span class="p">,</span>
+      <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;map&quot;</span><span class="p">,</span>
+      <span class="s">&quot;offset&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s">&quot;slot&quot;</span><span class="o">:</span> <span class="s">&quot;7&quot;</span><span class="p">,</span>
+      <span class="s">&quot;type&quot;</span><span class="o">:</span> <span class="s">&quot;t_mapping(t_uint256,t_mapping(t_address,t_bool))&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="s">&quot;astId&quot;</span><span class="o">:</span> <span class="mi">29</span><span class="p">,</span>
+      <span class="s">&quot;contract&quot;</span><span class="o">:</span> <span class="s">&quot;fileA:A&quot;</span><span class="p">,</span>
+      <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;array&quot;</span><span class="p">,</span>
+      <span class="s">&quot;offset&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s">&quot;slot&quot;</span><span class="o">:</span> <span class="s">&quot;8&quot;</span><span class="p">,</span>
+      <span class="s">&quot;type&quot;</span><span class="o">:</span> <span class="s">&quot;t_array(t_uint256)dyn_storage&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="s">&quot;astId&quot;</span><span class="o">:</span> <span class="mi">31</span><span class="p">,</span>
+      <span class="s">&quot;contract&quot;</span><span class="o">:</span> <span class="s">&quot;fileA:A&quot;</span><span class="p">,</span>
+      <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;s1&quot;</span><span class="p">,</span>
+      <span class="s">&quot;offset&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s">&quot;slot&quot;</span><span class="o">:</span> <span class="s">&quot;9&quot;</span><span class="p">,</span>
+      <span class="s">&quot;type&quot;</span><span class="o">:</span> <span class="s">&quot;t_string_storage&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="s">&quot;astId&quot;</span><span class="o">:</span> <span class="mi">33</span><span class="p">,</span>
+      <span class="s">&quot;contract&quot;</span><span class="o">:</span> <span class="s">&quot;fileA:A&quot;</span><span class="p">,</span>
+      <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;b1&quot;</span><span class="p">,</span>
+      <span class="s">&quot;offset&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="s">&quot;slot&quot;</span><span class="o">:</span> <span class="s">&quot;10&quot;</span><span class="p">,</span>
+      <span class="s">&quot;type&quot;</span><span class="o">:</span> <span class="s">&quot;t_bytes_storage&quot;</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="s">&quot;types&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s">&quot;t_address&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s">&quot;encoding&quot;</span><span class="o">:</span> <span class="s">&quot;inplace&quot;</span><span class="p">,</span>
+      <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;address&quot;</span><span class="p">,</span>
+      <span class="s">&quot;numberOfBytes&quot;</span><span class="o">:</span> <span class="s">&quot;20&quot;</span>
+    <span class="p">},</span>
+    <span class="s">&quot;t_array(t_uint256)2_storage&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s">&quot;base&quot;</span><span class="o">:</span> <span class="s">&quot;t_uint256&quot;</span><span class="p">,</span>
+      <span class="s">&quot;encoding&quot;</span><span class="o">:</span> <span class="s">&quot;inplace&quot;</span><span class="p">,</span>
+      <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;uint256[2]&quot;</span><span class="p">,</span>
+      <span class="s">&quot;numberOfBytes&quot;</span><span class="o">:</span> <span class="s">&quot;64&quot;</span>
+    <span class="p">},</span>
+    <span class="s">&quot;t_array(t_uint256)dyn_storage&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s">&quot;base&quot;</span><span class="o">:</span> <span class="s">&quot;t_uint256&quot;</span><span class="p">,</span>
+      <span class="s">&quot;encoding&quot;</span><span class="o">:</span> <span class="s">&quot;dynamic_array&quot;</span><span class="p">,</span>
+      <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;uint256[]&quot;</span><span class="p">,</span>
+      <span class="s">&quot;numberOfBytes&quot;</span><span class="o">:</span> <span class="s">&quot;32&quot;</span>
+    <span class="p">},</span>
+    <span class="s">&quot;t_bool&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s">&quot;encoding&quot;</span><span class="o">:</span> <span class="s">&quot;inplace&quot;</span><span class="p">,</span>
+      <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;bool&quot;</span><span class="p">,</span>
+      <span class="s">&quot;numberOfBytes&quot;</span><span class="o">:</span> <span class="s">&quot;1&quot;</span>
+    <span class="p">},</span>
+    <span class="s">&quot;t_bytes_storage&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s">&quot;encoding&quot;</span><span class="o">:</span> <span class="s">&quot;bytes&quot;</span><span class="p">,</span>
+      <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;bytes&quot;</span><span class="p">,</span>
+      <span class="s">&quot;numberOfBytes&quot;</span><span class="o">:</span> <span class="s">&quot;32&quot;</span>
+    <span class="p">},</span>
+    <span class="s">&quot;t_mapping(t_address,t_bool)&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s">&quot;encoding&quot;</span><span class="o">:</span> <span class="s">&quot;mapping&quot;</span><span class="p">,</span>
+      <span class="s">&quot;key&quot;</span><span class="o">:</span> <span class="s">&quot;t_address&quot;</span><span class="p">,</span>
+      <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;mapping(address =&gt; bool)&quot;</span><span class="p">,</span>
+      <span class="s">&quot;numberOfBytes&quot;</span><span class="o">:</span> <span class="s">&quot;32&quot;</span><span class="p">,</span>
+      <span class="s">&quot;value&quot;</span><span class="o">:</span> <span class="s">&quot;t_bool&quot;</span>
+    <span class="p">},</span>
+    <span class="s">&quot;t_mapping(t_uint256,t_mapping(t_address,t_bool))&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s">&quot;encoding&quot;</span><span class="o">:</span> <span class="s">&quot;mapping&quot;</span><span class="p">,</span>
+      <span class="s">&quot;key&quot;</span><span class="o">:</span> <span class="s">&quot;t_uint256&quot;</span><span class="p">,</span>
+      <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;mapping(uint256 =&gt; mapping(address =&gt; bool))&quot;</span><span class="p">,</span>
+      <span class="s">&quot;numberOfBytes&quot;</span><span class="o">:</span> <span class="s">&quot;32&quot;</span><span class="p">,</span>
+      <span class="s">&quot;value&quot;</span><span class="o">:</span> <span class="s">&quot;t_mapping(t_address,t_bool)&quot;</span>
+    <span class="p">},</span>
+    <span class="s">&quot;t_string_storage&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s">&quot;encoding&quot;</span><span class="o">:</span> <span class="s">&quot;bytes&quot;</span><span class="p">,</span>
+      <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;string&quot;</span><span class="p">,</span>
+      <span class="s">&quot;numberOfBytes&quot;</span><span class="o">:</span> <span class="s">&quot;32&quot;</span>
+    <span class="p">},</span>
+    <span class="s">&quot;t_struct(S)12_storage&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s">&quot;encoding&quot;</span><span class="o">:</span> <span class="s">&quot;inplace&quot;</span><span class="p">,</span>
+      <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;struct A.S&quot;</span><span class="p">,</span>
+      <span class="s">&quot;members&quot;</span><span class="o">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+          <span class="s">&quot;astId&quot;</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+          <span class="s">&quot;contract&quot;</span><span class="o">:</span> <span class="s">&quot;fileA:A&quot;</span><span class="p">,</span>
+          <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;a&quot;</span><span class="p">,</span>
+          <span class="s">&quot;offset&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+          <span class="s">&quot;slot&quot;</span><span class="o">:</span> <span class="s">&quot;0&quot;</span><span class="p">,</span>
+          <span class="s">&quot;type&quot;</span><span class="o">:</span> <span class="s">&quot;t_uint128&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="s">&quot;astId&quot;</span><span class="o">:</span> <span class="mi">4</span><span class="p">,</span>
+          <span class="s">&quot;contract&quot;</span><span class="o">:</span> <span class="s">&quot;fileA:A&quot;</span><span class="p">,</span>
+          <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;b&quot;</span><span class="p">,</span>
+          <span class="s">&quot;offset&quot;</span><span class="o">:</span> <span class="mi">16</span><span class="p">,</span>
+          <span class="s">&quot;slot&quot;</span><span class="o">:</span> <span class="s">&quot;0&quot;</span><span class="p">,</span>
+          <span class="s">&quot;type&quot;</span><span class="o">:</span> <span class="s">&quot;t_uint128&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="s">&quot;astId&quot;</span><span class="o">:</span> <span class="mi">8</span><span class="p">,</span>
+          <span class="s">&quot;contract&quot;</span><span class="o">:</span> <span class="s">&quot;fileA:A&quot;</span><span class="p">,</span>
+          <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;staticArray&quot;</span><span class="p">,</span>
+          <span class="s">&quot;offset&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+          <span class="s">&quot;slot&quot;</span><span class="o">:</span> <span class="s">&quot;1&quot;</span><span class="p">,</span>
+          <span class="s">&quot;type&quot;</span><span class="o">:</span> <span class="s">&quot;t_array(t_uint256)2_storage&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="s">&quot;astId&quot;</span><span class="o">:</span> <span class="mi">11</span><span class="p">,</span>
+          <span class="s">&quot;contract&quot;</span><span class="o">:</span> <span class="s">&quot;fileA:A&quot;</span><span class="p">,</span>
+          <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;dynArray&quot;</span><span class="p">,</span>
+          <span class="s">&quot;offset&quot;</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+          <span class="s">&quot;slot&quot;</span><span class="o">:</span> <span class="s">&quot;3&quot;</span><span class="p">,</span>
+          <span class="s">&quot;type&quot;</span><span class="o">:</span> <span class="s">&quot;t_array(t_uint256)dyn_storage&quot;</span>
+        <span class="p">}</span>
+      <span class="p">],</span>
+      <span class="s">&quot;numberOfBytes&quot;</span><span class="o">:</span> <span class="s">&quot;128&quot;</span>
+    <span class="p">},</span>
+    <span class="s">&quot;t_uint128&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s">&quot;encoding&quot;</span><span class="o">:</span> <span class="s">&quot;inplace&quot;</span><span class="p">,</span>
+      <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;uint128&quot;</span><span class="p">,</span>
+      <span class="s">&quot;numberOfBytes&quot;</span><span class="o">:</span> <span class="s">&quot;16&quot;</span>
+    <span class="p">},</span>
+    <span class="s">&quot;t_uint256&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s">&quot;encoding&quot;</span><span class="o">:</span> <span class="s">&quot;inplace&quot;</span><span class="p">,</span>
+      <span class="s">&quot;label&quot;</span><span class="o">:</span> <span class="s">&quot;uint256&quot;</span><span class="p">,</span>
+      <span class="s">&quot;numberOfBytes&quot;</span><span class="o">:</span> <span class="s">&quot;32&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../grammar.html" class="btn btn-neutral float-left" title="Language Grammar" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="layout_in_memory.html" class="btn btn-neutral float-right" title="Layout in Memory" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016-2025, The Solidity Authors.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book fa-element"> RTD </span>
+
+    <span class="fa fa-element">
+    <input class="container_toggle" type="checkbox" id="switch" name="mode">
+    <label for="switch"></label>
+    </span>
+
+    <span class="fa fa-v fa-element"> v:  <span class="fa fa-caret-down"></span></span>
+
+    </span>
+    <div class="rst-other-versions">
+        <dl>
+            <dt>Versions</dt> 
+        </dl>
+        <dl>
+            <dt>Downloads</dt> 
+        </dl>
+        <dl>
+            
+            <dt>On Read the Docs</dt>
+            <dd>
+                <a href="///projects//?fromdocs=">Project Home</a>
+            </dd>
+            <dd>
+                <a href="///builds//?fromdocs=">Builds</a>
+            </dd>
+        </dl>
+    </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

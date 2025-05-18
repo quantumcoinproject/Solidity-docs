@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Optimiser &mdash; Solidity 0.7.6 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/a4_railroad_diagram.css?v=a92580d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/fonts.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=f142d018" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom-dark.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/toggle.css?v=3a09e99e" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=918ced64"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/js/constants.js"></script>
+        <script src="../_static/js/initialize.js"></script>
+        <script src="../_static/js/toggle.js?v=531d20fa"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contract Metadata" href="../metadata.html" />
+    <link rel="prev" title="Source Mappings" href="source_mappings.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+          </a>
+              <div class="version">
+                0.7.6
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+    
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction-to-smart-contracts.html">Introduction to Smart Contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installing-solidity.html">Installing the Solidity Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../solidity-by-example.html">Solidity by Example</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Language Description</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../layout-of-source-files.html">Layout of a Solidity Source File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure-of-a-contract.html">Structure of a Contract</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../types.html">Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../units-and-global-variables.html">Units and Globally Available Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../control-structures.html">Expressions and Control Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contracts.html">Contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../assembly.html">Inline Assembly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cheatsheet.html">Cheatsheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../grammar.html">Language Grammar</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Internals</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="layout_in_storage.html">Layout of State Variables in Storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layout_in_memory.html">Layout in Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layout_in_calldata.html">Layout of Call Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="variable_cleanup.html">Cleaning Up Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source_mappings.html">Source Mappings</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The Optimiser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../metadata.html">Contract Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../abi-spec.html">Contract ABI Specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Material</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../050-breaking-changes.html">Solidity v0.5.0 Breaking Changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../060-breaking-changes.html">Solidity v0.6.0 Breaking Changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../070-breaking-changes.html">Solidity v0.7.0 Breaking Changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../natspec-format.html">NatSpec Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../security-considerations.html">Security Considerations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../resources.html">Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../using-the-compiler.html">Using the compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../yul.html">Yul</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../style-guide.html">Style Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../common-patterns.html">Common Patterns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bugs.html">List of Known Bugs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../brand-guide.html">Solidity Brand Guide</a></li>
+</ul>
+
+    <a href="genindex.html">Keyword Index</a>
+  
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Solidity</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">The Optimiser</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/internals/optimiser.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="the-optimiser">
+<span id="index-0"></span><h1>The Optimiser<a class="headerlink" href="#the-optimiser" title="Link to this heading"></a></h1>
+<p>This section discusses the optimiser that was first added to Solidity,
+which operates on opcode streams. For information on the new Yul-based optimiser,
+please see the <a class="reference external" href="https://github.com/ethereum/solidity/blob/develop/libyul/optimiser/README.md">readme on github</a>.</p>
+<p>The Solidity optimiser operates on assembly. It splits the sequence of instructions into basic blocks
+at <code class="docutils literal notranslate"><span class="pre">JUMPs</span></code> and <code class="docutils literal notranslate"><span class="pre">JUMPDESTs</span></code>. Inside these blocks, the optimiser
+analyses the instructions and records every modification to the stack,
+memory, or storage as an expression which consists of an instruction and
+a list of arguments which are pointers to other expressions. The optimiser
+uses a component called “CommonSubexpressionEliminator” that amongst other
+tasks, finds expressions that are always equal (on every input) and combines
+them into an expression class. The optimiser first tries to find each new
+expression in a list of already known expressions. If this does not work,
+it simplifies the expression according to rules like
+<code class="docutils literal notranslate"><span class="pre">constant</span> <span class="pre">+</span> <span class="pre">constant</span> <span class="pre">=</span> <span class="pre">sum_of_constants</span></code> or <code class="docutils literal notranslate"><span class="pre">X</span> <span class="pre">*</span> <span class="pre">1</span> <span class="pre">=</span> <span class="pre">X</span></code>. Since this is
+a recursive process, we can also apply the latter rule if the second factor
+is a more complex expression where we know that it always evaluates to one.
+Modifications to storage and memory locations have to erase knowledge about
+storage and memory locations which are not known to be different. If we first
+write to location x and then to location y and both are input variables, the
+second could overwrite the first, so we do not know what is stored at x after
+we wrote to y. If simplification of the expression x - y evaluates to a
+non-zero constant, we know that we can keep our knowledge about what is stored at x.</p>
+<p>After this process, we know which expressions have to be on the stack at
+the end, and have a list of modifications to memory and storage. This information
+is stored together with the basic blocks and is used to link them. Furthermore,
+knowledge about the stack, storage and memory configuration is forwarded to
+the next block(s). If we know the targets of all <code class="docutils literal notranslate"><span class="pre">JUMP</span></code> and <code class="docutils literal notranslate"><span class="pre">JUMPI</span></code> instructions,
+we can build a complete control flow graph of the program. If there is only
+one target we do not know (this can happen as in principle, jump targets can
+be computed from inputs), we have to erase all knowledge about the input state
+of a block as it can be the target of the unknown <code class="docutils literal notranslate"><span class="pre">JUMP</span></code>. If the optimiser
+finds a <code class="docutils literal notranslate"><span class="pre">JUMPI</span></code> whose condition evaluates to a constant, it transforms it
+to an unconditional jump.</p>
+<p>As the last step, the code in each block is re-generated. The optimiser creates
+a dependency graph from the expressions on the stack at the end of the block,
+and it drops every operation that is not part of this graph. It generates code
+that applies the modifications to memory and storage in the order they were
+made in the original code (dropping modifications which were found not to be
+needed). Finally, it generates all values that are required to be on the
+stack in the correct place.</p>
+<p>These steps are applied to each basic block and the newly generated code
+is used as replacement if it is smaller. If a basic block is split at a
+<code class="docutils literal notranslate"><span class="pre">JUMPI</span></code> and during the analysis, the condition evaluates to a constant,
+the <code class="docutils literal notranslate"><span class="pre">JUMPI</span></code> is replaced depending on the value of the constant. Thus code like</p>
+<p class="remix-link-container"><a class="remix-link reference external" href="https://remix.ethereum.org/?#language=solidity&amp;version=0.7.6&amp;code=dWludCB4ID0gNzsKZGF0YVs3XSA9IDk7CmlmIChkYXRhW3hdICE9IHggKyAyKQogIHJldHVybiAyOwplbHNlCiAgcmV0dXJuIDE7" target="_blank">open in Remix</a></p>
+<div class="highlight-Solidity notranslate"><div class="highlight"><pre><span></span><span class="kt">uint</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mi">9</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">!=</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
+  <span class="k">return</span> <span class="mi">2</span><span class="p">;</span>
+<span class="k">else</span>
+  <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>still simplifies to code which you can compile even though the instructions contained
+a jump in the beginning of the process:</p>
+<p class="remix-link-container"><a class="remix-link reference external" href="https://remix.ethereum.org/?#language=solidity&amp;version=0.7.6&amp;code=ZGF0YVs3XSA9IDk7CnJldHVybiAxOw==" target="_blank">open in Remix</a></p>
+<div class="highlight-Solidity notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mi">9</span><span class="p">;</span>
+<span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="source_mappings.html" class="btn btn-neutral float-left" title="Source Mappings" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../metadata.html" class="btn btn-neutral float-right" title="Contract Metadata" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016-2025, The Solidity Authors.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book fa-element"> RTD </span>
+
+    <span class="fa fa-element">
+    <input class="container_toggle" type="checkbox" id="switch" name="mode">
+    <label for="switch"></label>
+    </span>
+
+    <span class="fa fa-v fa-element"> v:  <span class="fa fa-caret-down"></span></span>
+
+    </span>
+    <div class="rst-other-versions">
+        <dl>
+            <dt>Versions</dt> 
+        </dl>
+        <dl>
+            <dt>Downloads</dt> 
+        </dl>
+        <dl>
+            
+            <dt>On Read the Docs</dt>
+            <dd>
+                <a href="///projects//?fromdocs=">Project Home</a>
+            </dd>
+            <dd>
+                <a href="///builds//?fromdocs=">Builds</a>
+            </dd>
+        </dl>
+    </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
