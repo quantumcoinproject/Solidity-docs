@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solidity IR-based Codegen Changes &mdash; Solidity 0.7.6 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/a4_railroad_diagram.css?v=a92580d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/fonts.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=f142d018" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom-dark.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/toggle.css?v=3a09e99e" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=918ced64"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/js/constants.js"></script>
+        <script src="../_static/js/initialize.js"></script>
+        <script src="../_static/js/toggle.js?v=531d20fa"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+          </a>
+              <div class="version">
+                0.7.6
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+    
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction-to-smart-contracts.html">Introduction to Smart Contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installing-solidity.html">Installing the Solidity Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../solidity-by-example.html">Solidity by Example</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Language Description</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../layout-of-source-files.html">Layout of a Solidity Source File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure-of-a-contract.html">Structure of a Contract</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../types.html">Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../units-and-global-variables.html">Units and Globally Available Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../control-structures.html">Expressions and Control Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contracts.html">Contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../assembly.html">Inline Assembly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cheatsheet.html">Cheatsheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../grammar.html">Language Grammar</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Internals</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../internals/layout_in_storage.html">Layout of State Variables in Storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../internals/layout_in_memory.html">Layout in Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../internals/layout_in_calldata.html">Layout of Call Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../internals/variable_cleanup.html">Cleaning Up Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../internals/source_mappings.html">Source Mappings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../internals/optimiser.html">The Optimiser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../metadata.html">Contract Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../abi-spec.html">Contract ABI Specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Material</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../050-breaking-changes.html">Solidity v0.5.0 Breaking Changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../060-breaking-changes.html">Solidity v0.6.0 Breaking Changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../070-breaking-changes.html">Solidity v0.7.0 Breaking Changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../natspec-format.html">NatSpec Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../security-considerations.html">Security Considerations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../resources.html">Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../using-the-compiler.html">Using the compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../yul.html">Yul</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../style-guide.html">Style Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../common-patterns.html">Common Patterns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bugs.html">List of Known Bugs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../brand-guide.html">Solidity Brand Guide</a></li>
+</ul>
+
+    <a href="genindex.html">Keyword Index</a>
+  
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Solidity</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Solidity IR-based Codegen Changes</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/ir/ir-breaking-changes.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="solidity-ir-based-codegen-changes">
+<h1>Solidity IR-based Codegen Changes<a class="headerlink" href="#solidity-ir-based-codegen-changes" title="Link to this heading"></a></h1>
+<p>This section highlights the main differences between the old and the IR-based codegen,
+along with the reasoning behind the changes and how to update affected code.</p>
+<section id="semantic-only-changes">
+<h2>Semantic Only Changes<a class="headerlink" href="#semantic-only-changes" title="Link to this heading"></a></h2>
+<p>This section lists the changes that are semantic-only, thus potentially
+hiding new and different behavior in existing code.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>When storage structs are deleted, every storage slot that contains a member of the struct is set to zero entirely. Formally, padding space was left untouched.
+Consequently, if the padding space within a struct is used to store data (e.g. in the context of a contract upgrade), you have to be aware that <code class="docutils literal notranslate"><span class="pre">delete</span></code> will now also clear the added member (while it wouldn’t have been cleared in the past).</p></li>
+</ul>
+</div></blockquote>
+<dl>
+<dt>::</dt><dd><p>// SPDX-License-Identifier: GPL-3.0
+pragma solidity &gt;0.7.0;</p>
+<dl>
+<dt>contract C {</dt><dd><dl class="simple">
+<dt>struct S {</dt><dd><p>uint64 y;
+uint64 z;</p>
+</dd>
+</dl>
+<p>}
+S s;
+function f() public {</p>
+<blockquote>
+<div><p>// …
+delete s;
+// s occupies only first 16 bytes of the 32 bytes slot
+// delete will write zero to the full slot</p>
+</div></blockquote>
+<p>}</p>
+</dd>
+</dl>
+<p>}</p>
+</dd>
+</dl>
+<p>We have the same behavior for implicit delete, for example when array of structs is shortened.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The order of contract initialization has changed in case of inheritance.</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>The order used to be:</dt><dd><ul class="simple">
+<li><p>All state variables are zero-initialized at the beginning.</p></li>
+<li><p>Evaluate base constructor arguments from most derived to most base contract.</p></li>
+<li><p>Initialize all state variables in the whole inheritance hierarchy from most base to most derived.</p></li>
+<li><p>Run the constructor, if present, for all contracts in the linearized hierarchy from most base to most derived.</p></li>
+</ul>
+</dd>
+<dt>New order:</dt><dd><ul class="simple">
+<li><p>All state variables are zero-initialized at the beginning.</p></li>
+<li><p>Evaluate base constructor arguments from most derived to most base contract.</p></li>
+<li><dl class="simple">
+<dt>For every contract in order from most base to most derived in the linearized hierarchy execute:</dt><dd><ol class="arabic simple">
+<li><p>If present at declaration, initial values are assigned to state variables.</p></li>
+<li><p>Constructor, if present.</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p>This causes differences in some contracts, for example:</p>
+<p class="remix-link-container"><a class="remix-link reference external" href="https://remix.ethereum.org/?#language=solidity&amp;version=0.7.6&amp;code=Ly8gU1BEWC1MaWNlbnNlLUlkZW50aWZpZXI6IEdQTC0zLjAKcHJhZ21hIHNvbGlkaXR5ID4wLjcuMDsKCmNvbnRyYWN0IEEgewogICAgdWludCB4OwogICAgY29uc3RydWN0b3IoKSB7CiAgICAgICAgeCA9IDQyOwogICAgfQogICAgZnVuY3Rpb24gZigpIHB1YmxpYyB2aWV3IHJldHVybnModWludDI1NikgewogICAgICAgIHJldHVybiB4OwogICAgfQp9CmNvbnRyYWN0IEIgaXMgQSB7CiAgICB1aW50IHB1YmxpYyB5ID0gZigpOwp9" target="_blank">open in Remix</a></p>
+<div class="highlight-Solidity notranslate"><div class="highlight"><pre><span></span><span class="c1">// </span><span class="cs">SPDX-License-Identifier:</span><span class="c1"> GPL-3.0</span>
+<span class="k">pragma solidity</span> <span class="o">&gt;</span><span class="mf">0.7</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="kd">contract</span> <span class="n">A</span> <span class="p">{</span>
+    <span class="kt">uint</span> <span class="n">x</span><span class="p">;</span>
+    <span class="kd">constructor</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="n">f</span><span class="p">()</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span><span class="p">(</span><span class="kt">uint256</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">x</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="kd">contract</span> <span class="n">B</span> <span class="k">is</span> <span class="n">A</span> <span class="p">{</span>
+    <span class="kt">uint</span> <span class="k">public</span> <span class="n">y</span> <span class="o">=</span> <span class="n">f</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Previously, <code class="docutils literal notranslate"><span class="pre">y</span></code> would be set to 0. This is due to the fact that we would first initialize state variables: First, <code class="docutils literal notranslate"><span class="pre">x</span></code> is set to 0, and when initializing <code class="docutils literal notranslate"><span class="pre">y</span></code>, <code class="docutils literal notranslate"><span class="pre">f()</span></code> would return 0 causing <code class="docutils literal notranslate"><span class="pre">y</span></code> to be 0 as well.
+With the new rules, <code class="docutils literal notranslate"><span class="pre">y</span></code> will be set to 42. We first initialize <code class="docutils literal notranslate"><span class="pre">x</span></code> to 0, then call A’s constructor which sets <code class="docutils literal notranslate"><span class="pre">x</span></code> to 42. Finally, when initializing <code class="docutils literal notranslate"><span class="pre">y</span></code>, <code class="docutils literal notranslate"><span class="pre">f()</span></code> returns 42 causing <code class="docutils literal notranslate"><span class="pre">y</span></code> to be 42.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016-2025, The Solidity Authors.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book fa-element"> RTD </span>
+
+    <span class="fa fa-element">
+    <input class="container_toggle" type="checkbox" id="switch" name="mode">
+    <label for="switch"></label>
+    </span>
+
+    <span class="fa fa-v fa-element"> v:  <span class="fa fa-caret-down"></span></span>
+
+    </span>
+    <div class="rst-other-versions">
+        <dl>
+            <dt>Versions</dt> 
+        </dl>
+        <dl>
+            <dt>Downloads</dt> 
+        </dl>
+        <dl>
+            
+            <dt>On Read the Docs</dt>
+            <dd>
+                <a href="///projects//?fromdocs=">Project Home</a>
+            </dd>
+            <dd>
+                <a href="///builds//?fromdocs=">Builds</a>
+            </dd>
+        </dl>
+    </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

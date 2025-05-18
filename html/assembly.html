@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inline Assembly &mdash; Solidity 0.7.6 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/a4_railroad_diagram.css?v=a92580d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/fonts.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=f142d018" />
+      <link rel="stylesheet" type="text/css" href="_static/css/custom-dark.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/toggle.css?v=3a09e99e" />
+
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=918ced64"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/js/constants.js"></script>
+        <script src="_static/js/initialize.js"></script>
+        <script src="_static/js/toggle.js?v=531d20fa"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Cheatsheet" href="cheatsheet.html" />
+    <link rel="prev" title="Contracts" href="contracts.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+          </a>
+              <div class="version">
+                0.7.6
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+    
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction-to-smart-contracts.html">Introduction to Smart Contracts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installing-solidity.html">Installing the Solidity Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="solidity-by-example.html">Solidity by Example</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Language Description</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="layout-of-source-files.html">Layout of a Solidity Source File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structure-of-a-contract.html">Structure of a Contract</a></li>
+<li class="toctree-l1"><a class="reference internal" href="types.html">Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units-and-global-variables.html">Units and Globally Available Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="control-structures.html">Expressions and Control Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contracts.html">Contracts</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Inline Assembly</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#access-to-external-variables-functions-and-libraries">Access to External Variables, Functions and Libraries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#things-to-avoid">Things to Avoid</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conventions-in-solidity">Conventions in Solidity</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cheatsheet.html">Cheatsheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="grammar.html">Language Grammar</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Internals</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="internals/layout_in_storage.html">Layout of State Variables in Storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="internals/layout_in_memory.html">Layout in Memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="internals/layout_in_calldata.html">Layout of Call Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="internals/variable_cleanup.html">Cleaning Up Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="internals/source_mappings.html">Source Mappings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="internals/optimiser.html">The Optimiser</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metadata.html">Contract Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="abi-spec.html">Contract ABI Specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Additional Material</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="050-breaking-changes.html">Solidity v0.5.0 Breaking Changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="060-breaking-changes.html">Solidity v0.6.0 Breaking Changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="070-breaking-changes.html">Solidity v0.7.0 Breaking Changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="natspec-format.html">NatSpec Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="security-considerations.html">Security Considerations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resources.html">Resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using-the-compiler.html">Using the compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yul.html">Yul</a></li>
+<li class="toctree-l1"><a class="reference internal" href="style-guide.html">Style Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="common-patterns.html">Common Patterns</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bugs.html">List of Known Bugs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="brand-guide.html">Solidity Brand Guide</a></li>
+</ul>
+
+    <a href="genindex.html">Keyword Index</a>
+  
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Solidity</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Inline Assembly</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/assembly.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="inline-assembly">
+<span id="id1"></span><h1>Inline Assembly<a class="headerlink" href="#inline-assembly" title="Link to this heading"></a></h1>
+<p id="index-0">You can interleave Solidity statements with inline assembly in a language close
+to the one of the Ethereum virtual machine. This gives you more fine-grained control,
+which is especially useful when you are enhancing the language by writing libraries.</p>
+<p>The language used for inline assembly in Solidity is called <a class="reference internal" href="yul.html#yul"><span class="std std-ref">Yul</span></a>
+and it is documented in its own section. This section will only cover
+how the inline assembly code can interface with the surrounding Solidity code.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Inline assembly is a way to access the Ethereum Virtual Machine
+at a low level. This bypasses several important safety
+features and checks of Solidity. You should only use it for
+tasks that need it, and only if you are confident with using it.</p>
+</div>
+<p>An inline assembly block is marked by <code class="docutils literal notranslate"><span class="pre">assembly</span> <span class="pre">{</span> <span class="pre">...</span> <span class="pre">}</span></code>, where the code inside
+the curly braces is code in the <a class="reference internal" href="yul.html#yul"><span class="std std-ref">Yul</span></a> language.</p>
+<p>The inline assembly code can access local Solidity variables as explained below.</p>
+<p>Different inline assembly blocks share no namespace, i.e. it is not possible
+to call a Yul function or access a Yul variable defined in a different inline assembly block.</p>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
+<p>The following example provides library code to access the code of another contract and
+load it into a <code class="docutils literal notranslate"><span class="pre">bytes</span></code> variable. This is not possible with “plain Solidity” and the
+idea is that reusable assembly libraries can enhance the Solidity language
+without a compiler change.</p>
+<p class="remix-link-container"><a class="remix-link reference external" href="https://remix.ethereum.org/?#language=solidity&amp;version=0.7.6&amp;code=Ly8gU1BEWC1MaWNlbnNlLUlkZW50aWZpZXI6IEdQTC0zLjAKcHJhZ21hIHNvbGlkaXR5ID49MC40LjE2IDwwLjguMDsKCmxpYnJhcnkgR2V0Q29kZSB7CiAgICBmdW5jdGlvbiBhdChhZGRyZXNzIF9hZGRyKSBwdWJsaWMgdmlldyByZXR1cm5zIChieXRlcyBtZW1vcnkgb19jb2RlKSB7CiAgICAgICAgYXNzZW1ibHkgewogICAgICAgICAgICAvLyByZXRyaWV2ZSB0aGUgc2l6ZSBvZiB0aGUgY29kZSwgdGhpcyBuZWVkcyBhc3NlbWJseQogICAgICAgICAgICBsZXQgc2l6ZSA6PSBleHRjb2Rlc2l6ZShfYWRkcikKICAgICAgICAgICAgLy8gYWxsb2NhdGUgb3V0cHV0IGJ5dGUgYXJyYXkgLSB0aGlzIGNvdWxkIGFsc28gYmUgZG9uZSB3aXRob3V0IGFzc2VtYmx5CiAgICAgICAgICAgIC8vIGJ5IHVzaW5nIG9fY29kZSA9IG5ldyBieXRlcyhzaXplKQogICAgICAgICAgICBvX2NvZGUgOj0gbWxvYWQoMHg0MCkKICAgICAgICAgICAgLy8gbmV3ICJtZW1vcnkgZW5kIiBpbmNsdWRpbmcgcGFkZGluZwogICAgICAgICAgICBtc3RvcmUoMHg0MCwgYWRkKG9fY29kZSwgYW5kKGFkZChhZGQoc2l6ZSwgMHgyMCksIDB4MWYpLCBub3QoMHgxZikpKSkKICAgICAgICAgICAgLy8gc3RvcmUgbGVuZ3RoIGluIG1lbW9yeQogICAgICAgICAgICBtc3RvcmUob19jb2RlLCBzaXplKQogICAgICAgICAgICAvLyBhY3R1YWxseSByZXRyaWV2ZSB0aGUgY29kZSwgdGhpcyBuZWVkcyBhc3NlbWJseQogICAgICAgICAgICBleHRjb2RlY29weShfYWRkciwgYWRkKG9fY29kZSwgMHgyMCksIDAsIHNpemUpCiAgICAgICAgfQogICAgfQp9" target="_blank">open in Remix</a></p>
+<div class="highlight-Solidity notranslate"><div class="highlight"><pre><span></span><span class="c1">// </span><span class="cs">SPDX-License-Identifier:</span><span class="c1"> GPL-3.0</span>
+<span class="k">pragma solidity</span> <span class="o">&gt;=</span><span class="mf">0.4</span><span class="p">.</span><span class="mi">16</span> <span class="o">&lt;</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="kd">library</span> <span class="n">GetCode</span> <span class="p">{</span>
+    <span class="kd">function</span> <span class="n">at</span><span class="p">(</span><span class="kt">address</span> <span class="n">_addr</span><span class="p">)</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bytes</span> <span class="k">memory</span> <span class="n">o_code</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">assembly</span> <span class="p">{</span>
+            <span class="c1">// retrieve the size of the code, this needs assembly</span>
+            <span class="ow">let</span> <span class="nv">size</span> <span class="o">:=</span> <span class="nf">extcodesize</span><span class="p">(</span><span class="n">_addr</span><span class="p">)</span>
+            <span class="c1">// allocate output byte array - this could also be done without assembly</span>
+            <span class="c1">// by using o_code = new bytes(size)</span>
+            <span class="n">o_code</span> <span class="o">:=</span> <span class="nf">mload</span><span class="p">(</span><span class="mh">0x40</span><span class="p">)</span>
+            <span class="c1">// new &quot;memory end&quot; including padding</span>
+            <span class="nf">mstore</span><span class="p">(</span><span class="mh">0x40</span><span class="p">,</span> <span class="nf">add</span><span class="p">(</span><span class="n">o_code</span><span class="p">,</span> <span class="nf">and</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">),</span> <span class="mh">0x1f</span><span class="p">),</span> <span class="nf">not</span><span class="p">(</span><span class="mh">0x1f</span><span class="p">))))</span>
+            <span class="c1">// store length in memory</span>
+            <span class="nf">mstore</span><span class="p">(</span><span class="n">o_code</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+            <span class="c1">// actually retrieve the code, this needs assembly</span>
+            <span class="nf">extcodecopy</span><span class="p">(</span><span class="n">_addr</span><span class="p">,</span> <span class="nf">add</span><span class="p">(</span><span class="n">o_code</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Inline assembly is also beneficial in cases where the optimizer fails to produce
+efficient code, for example:</p>
+<p class="remix-link-container"><a class="remix-link reference external" href="https://remix.ethereum.org/?#language=solidity&amp;version=0.7.6&amp;code=Ly8gU1BEWC1MaWNlbnNlLUlkZW50aWZpZXI6IEdQTC0zLjAKcHJhZ21hIHNvbGlkaXR5ID49MC40LjE2IDwwLjguMDsKCgpsaWJyYXJ5IFZlY3RvclN1bSB7CiAgICAvLyBUaGlzIGZ1bmN0aW9uIGlzIGxlc3MgZWZmaWNpZW50IGJlY2F1c2UgdGhlIG9wdGltaXplciBjdXJyZW50bHkgZmFpbHMgdG8KICAgIC8vIHJlbW92ZSB0aGUgYm91bmRzIGNoZWNrcyBpbiBhcnJheSBhY2Nlc3MuCiAgICBmdW5jdGlvbiBzdW1Tb2xpZGl0eSh1aW50W10gbWVtb3J5IF9kYXRhKSBwdWJsaWMgcHVyZSByZXR1cm5zICh1aW50IHN1bSkgewogICAgICAgIGZvciAodWludCBpID0gMDsgaSA8IF9kYXRhLmxlbmd0aDsgKytpKQogICAgICAgICAgICBzdW0gKz0gX2RhdGFbaV07CiAgICB9CgogICAgLy8gV2Uga25vdyB0aGF0IHdlIG9ubHkgYWNjZXNzIHRoZSBhcnJheSBpbiBib3VuZHMsIHNvIHdlIGNhbiBhdm9pZCB0aGUgY2hlY2suCiAgICAvLyAweDIwIG5lZWRzIHRvIGJlIGFkZGVkIHRvIGFuIGFycmF5IGJlY2F1c2UgdGhlIGZpcnN0IHNsb3QgY29udGFpbnMgdGhlCiAgICAvLyBhcnJheSBsZW5ndGguCiAgICBmdW5jdGlvbiBzdW1Bc20odWludFtdIG1lbW9yeSBfZGF0YSkgcHVibGljIHB1cmUgcmV0dXJucyAodWludCBzdW0pIHsKICAgICAgICBmb3IgKHVpbnQgaSA9IDA7IGkgPCBfZGF0YS5sZW5ndGg7ICsraSkgewogICAgICAgICAgICBhc3NlbWJseSB7CiAgICAgICAgICAgICAgICBzdW0gOj0gYWRkKHN1bSwgbWxvYWQoYWRkKGFkZChfZGF0YSwgMHgyMCksIG11bChpLCAweDIwKSkpKQogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQoKICAgIC8vIFNhbWUgYXMgYWJvdmUsIGJ1dCBhY2NvbXBsaXNoIHRoZSBlbnRpcmUgY29kZSB3aXRoaW4gaW5saW5lIGFzc2VtYmx5LgogICAgZnVuY3Rpb24gc3VtUHVyZUFzbSh1aW50W10gbWVtb3J5IF9kYXRhKSBwdWJsaWMgcHVyZSByZXR1cm5zICh1aW50IHN1bSkgewogICAgICAgIGFzc2VtYmx5IHsKICAgICAgICAgICAgLy8gTG9hZCB0aGUgbGVuZ3RoIChmaXJzdCAzMiBieXRlcykKICAgICAgICAgICAgbGV0IGxlbiA6PSBtbG9hZChfZGF0YSkKCiAgICAgICAgICAgIC8vIFNraXAgb3ZlciB0aGUgbGVuZ3RoIGZpZWxkLgogICAgICAgICAgICAvLwogICAgICAgICAgICAvLyBLZWVwIHRlbXBvcmFyeSB2YXJpYWJsZSBzbyBpdCBjYW4gYmUgaW5jcmVtZW50ZWQgaW4gcGxhY2UuCiAgICAgICAgICAgIC8vCiAgICAgICAgICAgIC8vIE5PVEU6IGluY3JlbWVudGluZyBfZGF0YSB3b3VsZCByZXN1bHQgaW4gYW4gdW51c2FibGUKICAgICAgICAgICAgLy8gICAgICAgX2RhdGEgdmFyaWFibGUgYWZ0ZXIgdGhpcyBhc3NlbWJseSBibG9jawogICAgICAgICAgICBsZXQgZGF0YSA6PSBhZGQoX2RhdGEsIDB4MjApCgogICAgICAgICAgICAvLyBJdGVyYXRlIHVudGlsIHRoZSBib3VuZCBpcyBub3QgbWV0LgogICAgICAgICAgICBmb3IKICAgICAgICAgICAgICAgIHsgbGV0IGVuZCA6PSBhZGQoZGF0YSwgbXVsKGxlbiwgMHgyMCkpIH0KICAgICAgICAgICAgICAgIGx0KGRhdGEsIGVuZCkKICAgICAgICAgICAgICAgIHsgZGF0YSA6PSBhZGQoZGF0YSwgMHgyMCkgfQogICAgICAgICAgICB7CiAgICAgICAgICAgICAgICBzdW0gOj0gYWRkKHN1bSwgbWxvYWQoZGF0YSkpCiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICB9Cn0=" target="_blank">open in Remix</a></p>
+<div class="highlight-Solidity notranslate"><div class="highlight"><pre><span></span><span class="c1">// </span><span class="cs">SPDX-License-Identifier:</span><span class="c1"> GPL-3.0</span>
+<span class="k">pragma solidity</span> <span class="o">&gt;=</span><span class="mf">0.4</span><span class="p">.</span><span class="mi">16</span> <span class="o">&lt;</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+
+<span class="kd">library</span> <span class="n">VectorSum</span> <span class="p">{</span>
+    <span class="c1">// This function is less efficient because the optimizer currently fails to</span>
+    <span class="c1">// remove the bounds checks in array access.</span>
+    <span class="kd">function</span> <span class="n">sumSolidity</span><span class="p">(</span><span class="kt">uint</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">_data</span><span class="p">)</span> <span class="k">public</span> <span class="k">pure</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span> <span class="n">sum</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">uint</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">_data</span><span class="p">.</span><span class="n">length</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">sum</span> <span class="o">+=</span> <span class="n">_data</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="p">}</span>
+
+    <span class="c1">// We know that we only access the array in bounds, so we can avoid the check.</span>
+    <span class="c1">// 0x20 needs to be added to an array because the first slot contains the</span>
+    <span class="c1">// array length.</span>
+    <span class="kd">function</span> <span class="n">sumAsm</span><span class="p">(</span><span class="kt">uint</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">_data</span><span class="p">)</span> <span class="k">public</span> <span class="k">pure</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span> <span class="n">sum</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">uint</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">_data</span><span class="p">.</span><span class="n">length</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">assembly</span> <span class="p">{</span>
+                <span class="n">sum</span> <span class="o">:=</span> <span class="nf">add</span><span class="p">(</span><span class="n">sum</span><span class="p">,</span> <span class="nf">mload</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="nf">add</span><span class="p">(</span><span class="n">_data</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">),</span> <span class="nf">mul</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">))))</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Same as above, but accomplish the entire code within inline assembly.</span>
+    <span class="kd">function</span> <span class="n">sumPureAsm</span><span class="p">(</span><span class="kt">uint</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">_data</span><span class="p">)</span> <span class="k">public</span> <span class="k">pure</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span> <span class="n">sum</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">assembly</span> <span class="p">{</span>
+            <span class="c1">// Load the length (first 32 bytes)</span>
+            <span class="ow">let</span> <span class="nv">len</span> <span class="o">:=</span> <span class="nf">mload</span><span class="p">(</span><span class="n">_data</span><span class="p">)</span>
+
+            <span class="c1">// Skip over the length field.</span>
+            <span class="c1">//</span>
+            <span class="c1">// Keep temporary variable so it can be incremented in place.</span>
+            <span class="c1">//</span>
+            <span class="c1">// NOTE: incrementing _data would result in an unusable</span>
+            <span class="c1">//       _data variable after this assembly block</span>
+            <span class="ow">let</span> <span class="nv">data</span> <span class="o">:=</span> <span class="nf">add</span><span class="p">(</span><span class="n">_data</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">)</span>
+
+            <span class="c1">// Iterate until the bound is not met.</span>
+            <span class="k">for</span>
+                <span class="p">{</span> <span class="ow">let</span> <span class="nv">end</span> <span class="o">:=</span> <span class="nf">add</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nf">mul</span><span class="p">(</span><span class="n">len</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">))</span> <span class="p">}</span>
+                <span class="nf">lt</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+                <span class="p">{</span> <span class="n">data</span> <span class="o">:=</span> <span class="nf">add</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="mh">0x20</span><span class="p">)</span> <span class="p">}</span>
+            <span class="p">{</span>
+                <span class="n">sum</span> <span class="o">:=</span> <span class="nf">add</span><span class="p">(</span><span class="n">sum</span><span class="p">,</span> <span class="nf">mload</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="access-to-external-variables-functions-and-libraries">
+<h2>Access to External Variables, Functions and Libraries<a class="headerlink" href="#access-to-external-variables-functions-and-libraries" title="Link to this heading"></a></h2>
+<p>You can access Solidity variables and other identifiers by using their name.</p>
+<p>Local variables of value type are directly usable in inline assembly.</p>
+<p>Local variables that refer to memory or calldata evaluate to the
+address of the variable in memory, resp. calldata, not the value itself.</p>
+<p>For local storage variables or state variables, a single Yul identifier
+is not sufficient, since they do not necessarily occupy a single full storage slot.
+Therefore, their “address” is composed of a slot and a byte-offset
+inside that slot. To retrieve the slot pointed to by the variable <code class="docutils literal notranslate"><span class="pre">x</span></code>, you
+use <code class="docutils literal notranslate"><span class="pre">x.slot</span></code>, and to retrieve the byte-offset you use <code class="docutils literal notranslate"><span class="pre">x.offset</span></code>.
+Using <code class="docutils literal notranslate"><span class="pre">x</span></code> itself will result in an error.</p>
+<p>For dynamic calldata arrays, you can access
+their calldata offset (in bytes) and length (number of elements) using <code class="docutils literal notranslate"><span class="pre">x.offset</span></code> and <code class="docutils literal notranslate"><span class="pre">x.length</span></code>.
+Both expressions can also be assigned to.</p>
+<p>Local Solidity variables are available for assignments, for example:</p>
+<p class="remix-link-container"><a class="remix-link reference external" href="https://remix.ethereum.org/?#language=solidity&amp;version=0.7.6&amp;code=Ly8gU1BEWC1MaWNlbnNlLUlkZW50aWZpZXI6IEdQTC0zLjAKcHJhZ21hIHNvbGlkaXR5IF4wLjcuMDsKCmNvbnRyYWN0IEMgewogICAgdWludCBiOwogICAgZnVuY3Rpb24gZih1aW50IHgpIHB1YmxpYyB2aWV3IHJldHVybnMgKHVpbnQgcikgewogICAgICAgIGFzc2VtYmx5IHsKICAgICAgICAgICAgLy8gV2UgaWdub3JlIHRoZSBzdG9yYWdlIHNsb3Qgb2Zmc2V0LCB3ZSBrbm93IGl0IGlzIHplcm8KICAgICAgICAgICAgLy8gaW4gdGhpcyBzcGVjaWFsIGNhc2UuCiAgICAgICAgICAgIHIgOj0gbXVsKHgsIHNsb2FkKGIuc2xvdCkpCiAgICAgICAgfQogICAgfQp9" target="_blank">open in Remix</a></p>
+<div class="highlight-Solidity notranslate"><div class="highlight"><pre><span></span><span class="c1">// </span><span class="cs">SPDX-License-Identifier:</span><span class="c1"> GPL-3.0</span>
+<span class="k">pragma solidity</span> <span class="o">^</span><span class="mf">0.7</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="kd">contract</span> <span class="n">C</span> <span class="p">{</span>
+    <span class="kt">uint</span> <span class="n">b</span><span class="p">;</span>
+    <span class="kd">function</span> <span class="n">f</span><span class="p">(</span><span class="kt">uint</span> <span class="n">x</span><span class="p">)</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span> <span class="n">r</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">assembly</span> <span class="p">{</span>
+            <span class="c1">// We ignore the storage slot offset, we know it is zero</span>
+            <span class="c1">// in this special case.</span>
+            <span class="n">r</span> <span class="o">:=</span> <span class="nf">mul</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nf">sload</span><span class="p">(</span><span class="n">b</span><span class="err">.</span><span class="n">slot</span><span class="p">))</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If you access variables of a type that spans less than 256 bits
+(for example <code class="docutils literal notranslate"><span class="pre">uint64</span></code>, <code class="docutils literal notranslate"><span class="pre">address</span></code>, <code class="docutils literal notranslate"><span class="pre">bytes16</span></code> or <code class="docutils literal notranslate"><span class="pre">byte</span></code>),
+you cannot make any assumptions about bits not part of the
+encoding of the type. Especially, do not assume them to be zero.
+To be safe, always clear the data properly before you use it
+in a context where this is important:
+<code class="docutils literal notranslate"><span class="pre">uint32</span> <span class="pre">x</span> <span class="pre">=</span> <span class="pre">f();</span> <span class="pre">assembly</span> <span class="pre">{</span> <span class="pre">x</span> <span class="pre">:=</span> <span class="pre">and(x,</span> <span class="pre">0xffffffff)</span> <span class="pre">/*</span> <span class="pre">now</span> <span class="pre">use</span> <span class="pre">x</span> <span class="pre">*/</span> <span class="pre">}</span></code>
+To clean signed types, you can use the <code class="docutils literal notranslate"><span class="pre">signextend</span></code> opcode:
+<code class="docutils literal notranslate"><span class="pre">assembly</span> <span class="pre">{</span> <span class="pre">signextend(&lt;num_bytes_of_x_minus_one&gt;,</span> <span class="pre">x)</span> <span class="pre">}</span></code></p>
+</div>
+<p>Since Solidity 0.6.0 the name of a inline assembly variable may not
+shadow any declaration visible in the scope of the inline assembly block
+(including variable, contract and function declarations).</p>
+<p>Since Solidity 0.7.0, variables and functions declared inside the
+inline assembly block may not contain <code class="docutils literal notranslate"><span class="pre">.</span></code>, but using <code class="docutils literal notranslate"><span class="pre">.</span></code> is
+valid to access Solidity variables from outside the inline assembly block.</p>
+<p>Assignments are possible to assembly-local variables and to function-local
+variables. Take care that when you assign to variables that point to
+memory or storage, you will only change the pointer and not the data.</p>
+<p>You can assign to the <code class="docutils literal notranslate"><span class="pre">.slot</span></code> part of a local storage variable pointer.
+For these (structs, arrays or mappings), the <code class="docutils literal notranslate"><span class="pre">.offset</span></code> part is always zero.
+It is not possible to assign to the <code class="docutils literal notranslate"><span class="pre">.slot</span></code> or <code class="docutils literal notranslate"><span class="pre">.offset</span></code> part of a state variable,
+though.</p>
+</section>
+<section id="things-to-avoid">
+<h2>Things to Avoid<a class="headerlink" href="#things-to-avoid" title="Link to this heading"></a></h2>
+<p>Inline assembly might have a quite high-level look, but it actually is extremely
+low-level. Function calls, loops, ifs and switches are converted by simple
+rewriting rules and after that, the only thing the assembler does for you is re-arranging
+functional-style opcodes, counting stack height for
+variable access and removing stack slots for assembly-local variables when the end
+of their block is reached.</p>
+</section>
+<section id="conventions-in-solidity">
+<h2>Conventions in Solidity<a class="headerlink" href="#conventions-in-solidity" title="Link to this heading"></a></h2>
+<p>In contrast to EVM assembly, Solidity has types which are narrower than 256 bits,
+e.g. <code class="docutils literal notranslate"><span class="pre">uint24</span></code>. For efficiency, most arithmetic operations ignore the fact that
+types can be shorter than 256
+bits, and the higher-order bits are cleaned when necessary,
+i.e., shortly before they are written to memory or before comparisons are performed.
+This means that if you access such a variable
+from within inline assembly, you might have to manually clean the higher-order bits
+first.</p>
+<p>Solidity manages memory in the following way. There is a “free memory pointer”
+at position <code class="docutils literal notranslate"><span class="pre">0x40</span></code> in memory. If you want to allocate memory, use the memory
+starting from where this pointer points at and update it.
+There is no guarantee that the memory has not been used before and thus
+you cannot assume that its contents are zero bytes.
+There is no built-in mechanism to release or free allocated memory.
+Here is an assembly snippet you can use for allocating memory that follows the process outlined above:</p>
+<p class="remix-link-container"><a class="remix-link reference external" href="https://remix.ethereum.org/?#language=solidity&amp;version=0.7.6&amp;code=ZnVuY3Rpb24gYWxsb2NhdGUobGVuZ3RoKSAtPiBwb3MgewogIHBvcyA6PSBtbG9hZCgweDQwKQogIG1zdG9yZSgweDQwLCBhZGQocG9zLCBsZW5ndGgpKQp9" target="_blank">open in Remix</a></p>
+<div class="highlight-Solidity notranslate"><div class="highlight"><pre><span></span><span class="kd">function</span> <span class="n">allocate</span><span class="p">(</span><span class="n">length</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pos</span> <span class="p">{</span>
+  <span class="n">pos</span> <span class="o">:=</span> <span class="n">mload</span><span class="p">(</span><span class="mh">0x40</span><span class="p">)</span>
+  <span class="n">mstore</span><span class="p">(</span><span class="mh">0x40</span><span class="p">,</span> <span class="n">add</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">length</span><span class="p">))</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The first 64 bytes of memory can be used as “scratch space” for short-term
+allocation. The 32 bytes after the free memory pointer (i.e., starting at <code class="docutils literal notranslate"><span class="pre">0x60</span></code>)
+are meant to be zero permanently and is used as the initial value for
+empty dynamic memory arrays.
+This means that the allocatable memory starts at <code class="docutils literal notranslate"><span class="pre">0x80</span></code>, which is the initial value
+of the free memory pointer.</p>
+<p>Elements in memory arrays in Solidity always occupy multiples of 32 bytes (this is
+even true for <code class="docutils literal notranslate"><span class="pre">byte[]</span></code>, but not for <code class="docutils literal notranslate"><span class="pre">bytes</span></code> and <code class="docutils literal notranslate"><span class="pre">string</span></code>). Multi-dimensional memory
+arrays are pointers to memory arrays. The length of a dynamic array is stored at the
+first slot of the array and followed by the array elements.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Statically-sized memory arrays do not have a length field, but it might be added later
+to allow better convertibility between statically- and dynamically-sized arrays, so
+do not rely on this.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="contracts.html" class="btn btn-neutral float-left" title="Contracts" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cheatsheet.html" class="btn btn-neutral float-right" title="Cheatsheet" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2016-2025, The Solidity Authors.</p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book fa-element"> RTD </span>
+
+    <span class="fa fa-element">
+    <input class="container_toggle" type="checkbox" id="switch" name="mode">
+    <label for="switch"></label>
+    </span>
+
+    <span class="fa fa-v fa-element"> v:  <span class="fa fa-caret-down"></span></span>
+
+    </span>
+    <div class="rst-other-versions">
+        <dl>
+            <dt>Versions</dt> 
+        </dl>
+        <dl>
+            <dt>Downloads</dt> 
+        </dl>
+        <dl>
+            
+            <dt>On Read the Docs</dt>
+            <dd>
+                <a href="///projects//?fromdocs=">Project Home</a>
+            </dd>
+            <dd>
+                <a href="///builds//?fromdocs=">Builds</a>
+            </dd>
+        </dl>
+    </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
