@@ -355,7 +355,7 @@ where the decimal point is.</p>
 <p>The address type comes in two flavours, which are largely identical:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">address</span></code>: Holds a 20 byte value (size of an Ethereum address).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">address</span></code>: Holds a 32 byte value (size of an Ethereum address).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">address</span> <span class="pre">payable</span></code>: Same as <code class="docutils literal notranslate"><span class="pre">address</span></code>, but with the additional members <code class="docutils literal notranslate"><span class="pre">transfer</span></code> and <code class="docutils literal notranslate"><span class="pre">send</span></code>.</p></li>
 </ul>
 </div></blockquote>
@@ -365,7 +365,7 @@ while a plain <code class="docutils literal notranslate"><span class="pre">addre
 <p>Implicit conversions from <code class="docutils literal notranslate"><span class="pre">address</span> <span class="pre">payable</span></code> to <code class="docutils literal notranslate"><span class="pre">address</span></code> are allowed, whereas conversions from <code class="docutils literal notranslate"><span class="pre">address</span></code> to <code class="docutils literal notranslate"><span class="pre">address</span> <span class="pre">payable</span></code>
 must be explicit via <code class="docutils literal notranslate"><span class="pre">payable(&lt;address&gt;)</span></code>.</p>
 <p><a class="reference internal" href="#address-literals"><span class="std std-ref">Address literals</span></a> can be implicitly converted to <code class="docutils literal notranslate"><span class="pre">address</span> <span class="pre">payable</span></code>.</p>
-<p>Explicit conversions to and from <code class="docutils literal notranslate"><span class="pre">address</span></code> are allowed for integers, integer literals, <code class="docutils literal notranslate"><span class="pre">bytes20</span></code> and contract types with the following
+<p>Explicit conversions to and from <code class="docutils literal notranslate"><span class="pre">address</span></code> are allowed for integers, integer literals, <code class="docutils literal notranslate"><span class="pre">bytes32</span></code> and contract types with the following
 caveat:
 The result of a conversion of the form <code class="docutils literal notranslate"><span class="pre">address(x)</span></code>
 has the type <code class="docutils literal notranslate"><span class="pre">address</span> <span class="pre">payable</span></code>, if <code class="docutils literal notranslate"><span class="pre">x</span></code> is of integer or fixed bytes type,
@@ -391,8 +391,8 @@ address itself as <code class="docutils literal notranslate"><span class="pre">a
 <p>If you convert a type that uses a larger byte size to an <code class="docutils literal notranslate"><span class="pre">address</span></code>, for example <code class="docutils literal notranslate"><span class="pre">bytes32</span></code>, then the <code class="docutils literal notranslate"><span class="pre">address</span></code> is truncated.
 To reduce conversion ambiguity version 0.4.24 and higher of the compiler force you make the truncation explicit in the conversion.
 Take for example the 32-byte value <code class="docutils literal notranslate"><span class="pre">0x111122223333444455556666777788889999AAAABBBBCCCCDDDDEEEEFFFFCCCC</span></code>.</p>
-<p>You can use <code class="docutils literal notranslate"><span class="pre">address(uint160(bytes20(b)))</span></code>, which results in <code class="docutils literal notranslate"><span class="pre">0x111122223333444455556666777788889999aAaa</span></code>,
-or you can use <code class="docutils literal notranslate"><span class="pre">address(uint160(uint256(b)))</span></code>, which results in <code class="docutils literal notranslate"><span class="pre">0x777788889999AaAAbBbbCcccddDdeeeEfFFfCcCc</span></code>.</p>
+<p>You can use <code class="docutils literal notranslate"><span class="pre">address(uint256(bytes32(b)))</span></code>, which results in <code class="docutils literal notranslate"><span class="pre">0x111122223333444455556666777788889999aAaa</span></code>,
+or you can use <code class="docutils literal notranslate"><span class="pre">address(uint256(uint256(b)))</span></code>, which results in <code class="docutils literal notranslate"><span class="pre">0x777788889999AaAAbBbbCcccddDdeeeEfFFfCcCc</span></code>.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -735,196 +735,9 @@ subsequent unsigned integer values starting from <code class="docutils literal n
 </section>
 <section id="function-types">
 <span id="index-13"></span><span id="id9"></span><h3>Function Types<a class="headerlink" href="#function-types" title="Link to this heading"></a></h3>
-<p>Function types are the types of functions. Variables of function type
-can be assigned from functions and function parameters of function type
-can be used to pass functions to and return functions from function calls.
-Function types come in two flavours - <em>internal</em> and <em>external</em> functions:</p>
-<p>Internal functions can only be called inside the current contract (more specifically,
-inside the current code unit, which also includes internal library functions
-and inherited functions) because they cannot be executed outside of the
-context of the current contract. Calling an internal function is realized
-by jumping to its entry label, just like when calling a function of the current
-contract internally.</p>
-<p>External functions consist of an address and a function signature and they can
-be passed via and returned from external function calls.</p>
-<p>Function types are notated as follows:</p>
-<p class="remix-link-container"><a class="remix-link reference external" href="https://remix.ethereum.org/?#language=solidity&amp;version=0.7.6&amp;code=ZnVuY3Rpb24gKDxwYXJhbWV0ZXIgdHlwZXM+KSB7aW50ZXJuYWx8ZXh0ZXJuYWx9IFtwdXJlfHZpZXd8cGF5YWJsZV0gW3JldHVybnMgKDxyZXR1cm4gdHlwZXM+KV0=" target="_blank">open in Remix</a></p>
-<div class="highlight-Solidity notranslate"><div class="highlight"><pre><span></span><span class="kd">function</span> <span class="p">(</span><span class="o">&lt;</span><span class="n">parameter</span> <span class="n">types</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{</span><span class="k">internal</span><span class="o">|</span><span class="k">external</span><span class="p">}</span> <span class="p">[</span><span class="k">pure</span><span class="o">|</span><span class="k">view</span><span class="o">|</span><span class="k">payable</span><span class="p">]</span> <span class="p">[</span><span class="k">returns</span> <span class="p">(</span><span class="o">&lt;</span><span class="k">return</span> <span class="n">types</span><span class="o">&gt;</span><span class="p">)]</span>
-</pre></div>
-</div>
-<p>In contrast to the parameter types, the return types cannot be empty - if the
-function type should not return anything, the whole <code class="docutils literal notranslate"><span class="pre">returns</span> <span class="pre">(&lt;return</span> <span class="pre">types&gt;)</span></code>
-part has to be omitted.</p>
-<p>By default, function types are internal, so the <code class="docutils literal notranslate"><span class="pre">internal</span></code> keyword can be
-omitted. Note that this only applies to function types. Visibility has
-to be specified explicitly for functions defined in contracts, they
-do not have a default.</p>
-<p>Conversions:</p>
-<p>A function type <code class="docutils literal notranslate"><span class="pre">A</span></code> is implicitly convertible to a function type <code class="docutils literal notranslate"><span class="pre">B</span></code> if and only if
-their parameter types are identical, their return types are identical,
-their internal/external property is identical and the state mutability of <code class="docutils literal notranslate"><span class="pre">A</span></code>
-is not more restrictive than the state mutability of <code class="docutils literal notranslate"><span class="pre">B</span></code>. In particular:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">pure</span></code> functions can be converted to <code class="docutils literal notranslate"><span class="pre">view</span></code> and <code class="docutils literal notranslate"><span class="pre">non-payable</span></code> functions</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">view</span></code> functions can be converted to <code class="docutils literal notranslate"><span class="pre">non-payable</span></code> functions</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">payable</span></code> functions can be converted to <code class="docutils literal notranslate"><span class="pre">non-payable</span></code> functions</p></li>
-</ul>
-</div></blockquote>
-<p>No other conversions between function types are possible.</p>
-<p>The rule about <code class="docutils literal notranslate"><span class="pre">payable</span></code> and <code class="docutils literal notranslate"><span class="pre">non-payable</span></code> might be a little
-confusing, but in essence, if a function is <code class="docutils literal notranslate"><span class="pre">payable</span></code>, this means that it
-also accepts a payment of zero Ether, so it also is <code class="docutils literal notranslate"><span class="pre">non-payable</span></code>.
-On the other hand, a <code class="docutils literal notranslate"><span class="pre">non-payable</span></code> function will reject Ether sent to it,
-so <code class="docutils literal notranslate"><span class="pre">non-payable</span></code> functions cannot be converted to <code class="docutils literal notranslate"><span class="pre">payable</span></code> functions.</p>
-<p>If a function type variable is not initialised, calling it results
-in a failed assertion. The same happens if you call a function after using <code class="docutils literal notranslate"><span class="pre">delete</span></code>
-on it.</p>
-<p>If external function types are used outside of the context of Solidity,
-they are treated as the <code class="docutils literal notranslate"><span class="pre">function</span></code> type, which encodes the address
-followed by the function identifier together in a single <code class="docutils literal notranslate"><span class="pre">bytes24</span></code> type.</p>
-<p>Note that public functions of the current contract can be used both as an
-internal and as an external function. To use <code class="docutils literal notranslate"><span class="pre">f</span></code> as an internal function,
-just use <code class="docutils literal notranslate"><span class="pre">f</span></code>, if you want to use its external form, use <code class="docutils literal notranslate"><span class="pre">this.f</span></code>.</p>
-<p>Members:</p>
-<p>External (or public) functions have the following members:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">.address</span></code> returns the address of the contract of the function.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">.selector</span></code> returns the <a class="reference internal" href="abi-spec.html#abi-function-selector"><span class="std std-ref">ABI function selector</span></a></p></li>
-</ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>External (or public) functions used to have the additional members
-<code class="docutils literal notranslate"><span class="pre">.gas(uint)</span></code> and <code class="docutils literal notranslate"><span class="pre">.value(uint)</span></code>. These were deprecated in Solidity 0.6.2
-and removed in Solidity 0.7.0. Instead use <code class="docutils literal notranslate"><span class="pre">{gas:</span> <span class="pre">...}</span></code> and <code class="docutils literal notranslate"><span class="pre">{value:</span> <span class="pre">...}</span></code>
-to specify the amount of gas or the amount of wei sent to a function,
-respectively. See <a class="reference internal" href="control-structures.html#external-function-calls"><span class="std std-ref">External Function Calls</span></a> for
-more information.</p>
-</div>
-<p>Example that shows how to use the members:</p>
-<p class="remix-link-container"><a class="remix-link reference external" href="https://remix.ethereum.org/?#language=solidity&amp;version=0.7.6&amp;code=Ly8gU1BEWC1MaWNlbnNlLUlkZW50aWZpZXI6IEdQTC0zLjAKcHJhZ21hIHNvbGlkaXR5ID49MC42LjQgPDAuOC4wOwoKY29udHJhY3QgRXhhbXBsZSB7CiAgICBmdW5jdGlvbiBmKCkgcHVibGljIHBheWFibGUgcmV0dXJucyAoYnl0ZXM0KSB7CiAgICAgICAgYXNzZXJ0KHRoaXMuZi5hZGRyZXNzID09IGFkZHJlc3ModGhpcykpOwogICAgICAgIHJldHVybiB0aGlzLmYuc2VsZWN0b3I7CiAgICB9CgogICAgZnVuY3Rpb24gZygpIHB1YmxpYyB7CiAgICAgICAgdGhpcy5me2dhczogMTAsIHZhbHVlOiA4MDB9KCk7CiAgICB9Cn0=" target="_blank">open in Remix</a></p>
-<div class="highlight-Solidity notranslate"><div class="highlight"><pre><span></span><span class="c1">// </span><span class="cs">SPDX-License-Identifier:</span><span class="c1"> GPL-3.0</span>
-<span class="k">pragma solidity</span> <span class="o">&gt;=</span><span class="mf">0.6</span><span class="p">.</span><span class="mi">4</span> <span class="o">&lt;</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
-
-<span class="kd">contract</span> <span class="n">Example</span> <span class="p">{</span>
-    <span class="kd">function</span> <span class="n">f</span><span class="p">()</span> <span class="k">public</span> <span class="k">payable</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bytes4</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nf">assert</span><span class="p">(</span><span class="nb">this</span><span class="p">.</span><span class="n">f</span><span class="p">.</span><span class="kt">address</span> <span class="o">==</span> <span class="kt">address</span><span class="p">(</span><span class="nb">this</span><span class="p">));</span>
-        <span class="k">return</span> <span class="nb">this</span><span class="p">.</span><span class="n">f</span><span class="p">.</span><span class="nb">selector</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="kd">function</span> <span class="n">g</span><span class="p">()</span> <span class="k">public</span> <span class="p">{</span>
-        <span class="nb">this</span><span class="p">.</span><span class="n">f</span><span class="p">{</span><span class="n">gas</span><span class="o">:</span> <span class="mi">10</span><span class="p">,</span> <span class="n">value</span><span class="o">:</span> <span class="mi">800</span><span class="p">}();</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Example that shows how to use internal function types:</p>
-<p class="remix-link-container"><a class="remix-link reference external" href="https://remix.ethereum.org/?#language=solidity&amp;version=0.7.6&amp;code=Ly8gU1BEWC1MaWNlbnNlLUlkZW50aWZpZXI6IEdQTC0zLjAKcHJhZ21hIHNvbGlkaXR5ID49MC40LjE2IDwwLjguMDsKCmxpYnJhcnkgQXJyYXlVdGlscyB7CiAgICAvLyBpbnRlcm5hbCBmdW5jdGlvbnMgY2FuIGJlIHVzZWQgaW4gaW50ZXJuYWwgbGlicmFyeSBmdW5jdGlvbnMgYmVjYXVzZQogICAgLy8gdGhleSB3aWxsIGJlIHBhcnQgb2YgdGhlIHNhbWUgY29kZSBjb250ZXh0CiAgICBmdW5jdGlvbiBtYXAodWludFtdIG1lbW9yeSBzZWxmLCBmdW5jdGlvbiAodWludCkgcHVyZSByZXR1cm5zICh1aW50KSBmKQogICAgICAgIGludGVybmFsCiAgICAgICAgcHVyZQogICAgICAgIHJldHVybnMgKHVpbnRbXSBtZW1vcnkgcikKICAgIHsKICAgICAgICByID0gbmV3IHVpbnRbXShzZWxmLmxlbmd0aCk7CiAgICAgICAgZm9yICh1aW50IGkgPSAwOyBpIDwgc2VsZi5sZW5ndGg7IGkrKykgewogICAgICAgICAgICByW2ldID0gZihzZWxmW2ldKTsKICAgICAgICB9CiAgICB9CgogICAgZnVuY3Rpb24gcmVkdWNlKAogICAgICAgIHVpbnRbXSBtZW1vcnkgc2VsZiwKICAgICAgICBmdW5jdGlvbiAodWludCwgdWludCkgcHVyZSByZXR1cm5zICh1aW50KSBmCiAgICApCiAgICAgICAgaW50ZXJuYWwKICAgICAgICBwdXJlCiAgICAgICAgcmV0dXJucyAodWludCByKQogICAgewogICAgICAgIHIgPSBzZWxmWzBdOwogICAgICAgIGZvciAodWludCBpID0gMTsgaSA8IHNlbGYubGVuZ3RoOyBpKyspIHsKICAgICAgICAgICAgciA9IGYociwgc2VsZltpXSk7CiAgICAgICAgfQogICAgfQoKICAgIGZ1bmN0aW9uIHJhbmdlKHVpbnQgbGVuZ3RoKSBpbnRlcm5hbCBwdXJlIHJldHVybnMgKHVpbnRbXSBtZW1vcnkgcikgewogICAgICAgIHIgPSBuZXcgdWludFtdKGxlbmd0aCk7CiAgICAgICAgZm9yICh1aW50IGkgPSAwOyBpIDwgci5sZW5ndGg7IGkrKykgewogICAgICAgICAgICByW2ldID0gaTsKICAgICAgICB9CiAgICB9Cn0KCgpjb250cmFjdCBQeXJhbWlkIHsKICAgIHVzaW5nIEFycmF5VXRpbHMgZm9yICo7CgogICAgZnVuY3Rpb24gcHlyYW1pZCh1aW50IGwpIHB1YmxpYyBwdXJlIHJldHVybnMgKHVpbnQpIHsKICAgICAgICByZXR1cm4gQXJyYXlVdGlscy5yYW5nZShsKS5tYXAoc3F1YXJlKS5yZWR1Y2Uoc3VtKTsKICAgIH0KCiAgICBmdW5jdGlvbiBzcXVhcmUodWludCB4KSBpbnRlcm5hbCBwdXJlIHJldHVybnMgKHVpbnQpIHsKICAgICAgICByZXR1cm4geCAqIHg7CiAgICB9CgogICAgZnVuY3Rpb24gc3VtKHVpbnQgeCwgdWludCB5KSBpbnRlcm5hbCBwdXJlIHJldHVybnMgKHVpbnQpIHsKICAgICAgICByZXR1cm4geCArIHk7CiAgICB9Cn0=" target="_blank">open in Remix</a></p>
-<div class="highlight-Solidity notranslate"><div class="highlight"><pre><span></span><span class="c1">// </span><span class="cs">SPDX-License-Identifier:</span><span class="c1"> GPL-3.0</span>
-<span class="k">pragma solidity</span> <span class="o">&gt;=</span><span class="mf">0.4</span><span class="p">.</span><span class="mi">16</span> <span class="o">&lt;</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
-
-<span class="kd">library</span> <span class="n">ArrayUtils</span> <span class="p">{</span>
-    <span class="c1">// internal functions can be used in internal library functions because</span>
-    <span class="c1">// they will be part of the same code context</span>
-    <span class="kd">function</span> <span class="n">map</span><span class="p">(</span><span class="kt">uint</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">self</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="kt">uint</span><span class="p">)</span> <span class="k">pure</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">)</span> <span class="n">f</span><span class="p">)</span>
-        <span class="k">internal</span>
-        <span class="k">pure</span>
-        <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">r</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">uint</span><span class="p">[](</span><span class="n">self</span><span class="p">.</span><span class="n">length</span><span class="p">);</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">uint</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">self</span><span class="p">.</span><span class="n">length</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">r</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">self</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-
-    <span class="kd">function</span> <span class="n">reduce</span><span class="p">(</span>
-        <span class="kt">uint</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">self</span><span class="p">,</span>
-        <span class="kd">function</span> <span class="p">(</span><span class="kt">uint</span><span class="p">,</span> <span class="kt">uint</span><span class="p">)</span> <span class="k">pure</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">)</span> <span class="n">f</span>
-    <span class="p">)</span>
-        <span class="k">internal</span>
-        <span class="k">pure</span>
-        <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span> <span class="n">r</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="n">self</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">uint</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">self</span><span class="p">.</span><span class="n">length</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">r</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">self</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-
-    <span class="kd">function</span> <span class="n">range</span><span class="p">(</span><span class="kt">uint</span> <span class="n">length</span><span class="p">)</span> <span class="k">internal</span> <span class="k">pure</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">r</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">uint</span><span class="p">[](</span><span class="n">length</span><span class="p">);</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">uint</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">r</span><span class="p">.</span><span class="n">length</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">r</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-
-<span class="kd">contract</span> <span class="n">Pyramid</span> <span class="p">{</span>
-    <span class="kn">using</span> <span class="n">ArrayUtils</span> <span class="k">for</span> <span class="o">*</span><span class="p">;</span>
-
-    <span class="kd">function</span> <span class="n">pyramid</span><span class="p">(</span><span class="kt">uint</span> <span class="n">l</span><span class="p">)</span> <span class="k">public</span> <span class="k">pure</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="n">ArrayUtils</span><span class="p">.</span><span class="n">range</span><span class="p">(</span><span class="n">l</span><span class="p">).</span><span class="n">map</span><span class="p">(</span><span class="n">square</span><span class="p">).</span><span class="n">reduce</span><span class="p">(</span><span class="n">sum</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="kd">function</span> <span class="n">square</span><span class="p">(</span><span class="kt">uint</span> <span class="n">x</span><span class="p">)</span> <span class="k">internal</span> <span class="k">pure</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="kd">function</span> <span class="n">sum</span><span class="p">(</span><span class="kt">uint</span> <span class="n">x</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">y</span><span class="p">)</span> <span class="k">internal</span> <span class="k">pure</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Another example that uses external function types:</p>
-<p class="remix-link-container"><a class="remix-link reference external" href="https://remix.ethereum.org/?#language=solidity&amp;version=0.7.6&amp;code=Ly8gU1BEWC1MaWNlbnNlLUlkZW50aWZpZXI6IEdQTC0zLjAKcHJhZ21hIHNvbGlkaXR5ID49MC40LjIyIDwwLjguMDsKCgpjb250cmFjdCBPcmFjbGUgewogICAgc3RydWN0IFJlcXVlc3QgewogICAgICAgIGJ5dGVzIGRhdGE7CiAgICAgICAgZnVuY3Rpb24odWludCkgZXh0ZXJuYWwgY2FsbGJhY2s7CiAgICB9CgogICAgUmVxdWVzdFtdIHByaXZhdGUgcmVxdWVzdHM7CiAgICBldmVudCBOZXdSZXF1ZXN0KHVpbnQpOwoKICAgIGZ1bmN0aW9uIHF1ZXJ5KGJ5dGVzIG1lbW9yeSBkYXRhLCBmdW5jdGlvbih1aW50KSBleHRlcm5hbCBjYWxsYmFjaykgcHVibGljIHsKICAgICAgICByZXF1ZXN0cy5wdXNoKFJlcXVlc3QoZGF0YSwgY2FsbGJhY2spKTsKICAgICAgICBlbWl0IE5ld1JlcXVlc3QocmVxdWVzdHMubGVuZ3RoIC0gMSk7CiAgICB9CgogICAgZnVuY3Rpb24gcmVwbHkodWludCByZXF1ZXN0SUQsIHVpbnQgcmVzcG9uc2UpIHB1YmxpYyB7CiAgICAgICAgLy8gSGVyZSBnb2VzIHRoZSBjaGVjayB0aGF0IHRoZSByZXBseSBjb21lcyBmcm9tIGEgdHJ1c3RlZCBzb3VyY2UKICAgICAgICByZXF1ZXN0c1tyZXF1ZXN0SURdLmNhbGxiYWNrKHJlc3BvbnNlKTsKICAgIH0KfQoKCmNvbnRyYWN0IE9yYWNsZVVzZXIgewogICAgT3JhY2xlIGNvbnN0YW50IHByaXZhdGUgT1JBQ0xFX0NPTlNUID0gT3JhY2xlKDB4MTIzNDU2Nyk7IC8vIGtub3duIGNvbnRyYWN0CiAgICB1aW50IHByaXZhdGUgZXhjaGFuZ2VSYXRlOwoKICAgIGZ1bmN0aW9uIGJ1eVNvbWV0aGluZygpIHB1YmxpYyB7CiAgICAgICAgT1JBQ0xFX0NPTlNULnF1ZXJ5KCJVU0QiLCB0aGlzLm9yYWNsZVJlc3BvbnNlKTsKICAgIH0KCiAgICBmdW5jdGlvbiBvcmFjbGVSZXNwb25zZSh1aW50IHJlc3BvbnNlKSBwdWJsaWMgewogICAgICAgIHJlcXVpcmUoCiAgICAgICAgICAgIG1zZy5zZW5kZXIgPT0gYWRkcmVzcyhPUkFDTEVfQ09OU1QpLAogICAgICAgICAgICAiT25seSBvcmFjbGUgY2FuIGNhbGwgdGhpcy4iCiAgICAgICAgKTsKICAgICAgICBleGNoYW5nZVJhdGUgPSByZXNwb25zZTsKICAgIH0KfQ==" target="_blank">open in Remix</a></p>
-<div class="highlight-Solidity notranslate"><div class="highlight"><pre><span></span><span class="c1">// </span><span class="cs">SPDX-License-Identifier:</span><span class="c1"> GPL-3.0</span>
-<span class="k">pragma solidity</span> <span class="o">&gt;=</span><span class="mf">0.4</span><span class="p">.</span><span class="mi">22</span> <span class="o">&lt;</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
-
-
-<span class="kd">contract</span> <span class="n">Oracle</span> <span class="p">{</span>
-    <span class="kd">struct</span> <span class="n">Request</span> <span class="p">{</span>
-        <span class="kt">bytes</span> <span class="n">data</span><span class="p">;</span>
-        <span class="kd">function</span><span class="p">(</span><span class="kt">uint</span><span class="p">)</span> <span class="k">external</span> <span class="n">callback</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="n">Request</span><span class="p">[]</span> <span class="k">private</span> <span class="n">requests</span><span class="p">;</span>
-    <span class="kd">event</span> <span class="n">NewRequest</span><span class="p">(</span><span class="kt">uint</span><span class="p">);</span>
-
-    <span class="kd">function</span> <span class="n">query</span><span class="p">(</span><span class="kt">bytes</span> <span class="k">memory</span> <span class="n">data</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="kt">uint</span><span class="p">)</span> <span class="k">external</span> <span class="n">callback</span><span class="p">)</span> <span class="k">public</span> <span class="p">{</span>
-        <span class="n">requests</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="n">Request</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">callback</span><span class="p">));</span>
-        <span class="k">emit</span> <span class="n">NewRequest</span><span class="p">(</span><span class="n">requests</span><span class="p">.</span><span class="n">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="kd">function</span> <span class="n">reply</span><span class="p">(</span><span class="kt">uint</span> <span class="n">requestID</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">response</span><span class="p">)</span> <span class="k">public</span> <span class="p">{</span>
-        <span class="c1">// Here goes the check that the reply comes from a trusted source</span>
-        <span class="n">requests</span><span class="p">[</span><span class="n">requestID</span><span class="p">].</span><span class="n">callback</span><span class="p">(</span><span class="n">response</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-
-<span class="kd">contract</span> <span class="n">OracleUser</span> <span class="p">{</span>
-    <span class="n">Oracle</span> <span class="k">constant</span> <span class="k">private</span> <span class="n">ORACLE_CONST</span> <span class="o">=</span> <span class="n">Oracle</span><span class="p">(</span><span class="mh">0x1234567</span><span class="p">);</span> <span class="c1">// known contract</span>
-    <span class="kt">uint</span> <span class="k">private</span> <span class="n">exchangeRate</span><span class="p">;</span>
-
-    <span class="kd">function</span> <span class="n">buySomething</span><span class="p">()</span> <span class="k">public</span> <span class="p">{</span>
-        <span class="n">ORACLE_CONST</span><span class="p">.</span><span class="n">query</span><span class="p">(</span><span class="s">&quot;USD&quot;</span><span class="p">,</span> <span class="nb">this</span><span class="p">.</span><span class="n">oracleResponse</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="kd">function</span> <span class="n">oracleResponse</span><span class="p">(</span><span class="kt">uint</span> <span class="n">response</span><span class="p">)</span> <span class="k">public</span> <span class="p">{</span>
-        <span class="nf">require</span><span class="p">(</span>
-            <span class="nb">msg.sender</span> <span class="o">==</span> <span class="kt">address</span><span class="p">(</span><span class="n">ORACLE_CONST</span><span class="p">),</span>
-            <span class="s">&quot;Only oracle can call this.&quot;</span>
-        <span class="p">);</span>
-        <span class="n">exchangeRate</span> <span class="o">=</span> <span class="n">response</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Lambda or inline functions are planned but not yet supported.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Function types are not supported.</p>
 </div>
 </section>
 </section>
@@ -1818,7 +1631,7 @@ if their number of characters matches the size of the bytes type:</p>
 <h3>Addresses<a class="headerlink" href="#addresses" title="Link to this heading"></a></h3>
 <p>As described in <a class="reference internal" href="#address-literals"><span class="std std-ref">Address Literals</span></a>, hex literals of the correct size that pass the checksum
 test are of <code class="docutils literal notranslate"><span class="pre">address</span></code> type. No other literals can be implicitly converted to the <code class="docutils literal notranslate"><span class="pre">address</span></code> type.</p>
-<p>Explicit conversions from <code class="docutils literal notranslate"><span class="pre">bytes20</span></code> or any integer type to <code class="docutils literal notranslate"><span class="pre">address</span></code> result in <code class="docutils literal notranslate"><span class="pre">address</span> <span class="pre">payable</span></code>.</p>
+<p>Explicit conversions from <code class="docutils literal notranslate"><span class="pre">bytes32</span></code> or any integer type to <code class="docutils literal notranslate"><span class="pre">address</span></code> result in <code class="docutils literal notranslate"><span class="pre">address</span> <span class="pre">payable</span></code>.</p>
 <p>An <code class="docutils literal notranslate"><span class="pre">address</span> <span class="pre">a</span></code> can be converted to <code class="docutils literal notranslate"><span class="pre">address</span> <span class="pre">payable</span></code> via <code class="docutils literal notranslate"><span class="pre">payable(a)</span></code>.</p>
 </section>
 </section>
